@@ -1,0 +1,1807 @@
+{% extends 'base.html' %}
+
+{% block myCss %}
+    <style type="text/css">
+
+        .mybtn{
+
+        }
+
+        .myTitle{
+            font-size: 12;
+        }
+
+        .aligncenter {
+            clear: both;
+            display: block;
+            margin:auto;
+        }
+
+        .modal-dialog{
+            z-index: 5;
+        }
+
+        .modal.left .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 20%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: auto;
+        }
+
+        .modal.left_more .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 42%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: auto;
+        }
+
+        .modal.right .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 21%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: auto;
+        }
+
+        .modal.left .modal-content,
+        .modal.right .modal-content {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .modal.left_more .modal-content{
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .modal.left .modal-body,
+        .modal.right .modal-body {
+            padding: 15px 15px 80px;
+        }
+
+        .modal.left_more .modal-body{
+            padding: 15px 15px 80px;
+        }
+
+        /*Middle*/
+
+
+        /*Left*/
+        .modal.left.fade .modal-dialog{
+            left: -320px;
+            -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                    transition: opacity 0.3s linear, left 0.3s ease-out;
+        }
+
+        .modal.left.fade.in .modal-dialog{
+            left: 0;
+        }
+
+        .modal.left_more.fade .modal-dialog{
+            left: -320px;
+            -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                    transition: opacity 0.3s linear, left 0.3s ease-out;
+        }
+
+        .modal.left_more.fade.in .modal-dialog{
+            left: 0;
+        }
+
+        /*Right*/
+        .modal.right.fade .modal-dialog {
+            right: -320px;
+            -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+                    transition: opacity 0.3s linear, right 0.3s ease-out;
+        }
+
+        .modal.right.fade.in .modal-dialog {
+            right: 0;
+        }
+
+        /* ----- MODAL STYLE ----- */
+        .modal-content {
+            border-radius: 0;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom-color: #EEEEEE;
+            background-color: #FAFAFA;
+        }
+
+        .modal-backdrop {
+            opacity: 0 !important;
+            filter: alpha(opacity=0) !important;
+        }
+
+        .htContextMenu.handsontable{
+            z-index:16777271;
+        }
+
+         /*select2在Bootstrap的modal中默认被遮盖，现在强制显示在最前*/
+    .select2-drop {
+        z-index: 10050 !important;
+    }
+
+    .select2-search-choice-close {
+        margin-top: 0 !important;
+        right: 2px !important;
+        min-height: 10px;
+    }
+
+        .select2-search-choice-close:before {
+            color: black !important;
+        }
+    /*防止select2不会自动失去焦点*/
+    .select2-container {
+        z-index: 16000 !important;
+    }
+
+    .select2-drop-mask {
+        z-index: 15990 !important;
+    }
+
+    .select2-drop-active {
+        z-index: 15995 !important;
+    }
+
+    </style>
+{#    <link rel="stylesheet" type="text/css" href="static/css/hover-min.css">#}
+    <link rel="stylesheet" type="text/css" href="http://demo.htmleaf.com/1609/201609271528/css/build.css">
+    <link rel="stylesheet" media="screen" href="http://127.0.0.1:8000/static/css/handsontable.full.css">
+    <link rel="stylesheet" media="screen" href="http://127.0.0.1:8000/static/css/bootstrap-select.min.css">
+{#    <link rel="stylesheet" type="text/css" href="http://demo.htmleaf.com/1501/201501111429/css/component.css">#}
+{#    <link rel="stylesheet" type="text/css" href="http://demo.htmleaf.com/1501/201501111429/css/demo.css">#}
+
+{% endblock %}
+
+{% block mainContent %}
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="title">选项</div>
+                </div>
+                <div class="pull-right card-action">
+
+                </div>
+            </div>
+            <div class="card-body" style="height: 600px;overflow:scroll" id="btnPanel">
+                <div class="sub-title">可视化</div>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="visualizations">可视化选项</button>
+                <div class="sub-title">组件</div>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="tooltip">悬浮窗设置</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="titles">标题设置</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="legend">图例设置</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="visualMap">视觉映射组件</button>
+                <button type="button" class="btn btn-primary" style="width:140px;" id="dataZoom">缩放轴设置</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="toolbox">工具栏设置</button>
+                <div class="sub-title">坐标轴</div>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="grids">直角格栅设置</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="geo">地理坐标</button>
+                <button type="button" class="btn btn-primary" style="width:140px;" id="singleAxis">单轴</button>
+                <button type="button" class="btn btn-primary" style="width: 140px;" id="parelle">平行轴</button>
+                <div class="sub-title">其他</div>
+                <button type="button" class="btn btn-primary" style="width:140px;" id="canvas">画布设置</button>
+                <button type="button" class="btn btn-primary" style="width:140px;" id="testDataOption">测试按钮</button>
+                <button type="button" class="btn btn-primary" style="width:140px;" id="saveChart">保存图表</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2" id="functionPanel">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="title" id="currentOption"></div>
+                </div>
+                <div class="pull-right card-action">
+                    <div class="btn-group" role="group" aria-label="...">
+                        <button type="button" class="btn btn-link" id="addNew"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" style="height: 600px" id="react">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="sub-title" id="chartName">{{ chartName }}</div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="chart" style="width: 100%;height: 610px;">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+{% endblock %}
+
+{% block FunctionalModal %}
+
+ <div class="modal fade" id=createPanel role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新建</h4>
+            </div>
+            <div class="modal-body no-padding" id="createContent">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade left" id=publicPanel role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="publicTitle"></h4>
+            </div>
+            <div class="modal-body no-padding" id="publicContent">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade left" id='bgpnl' role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">背景调色</h4>
+            </div>
+            <div class="modal-body no-padding" id="bgcl">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 这里是数据操作面板-------------------------------------这里是数据操作面板------------->
+<div class="modal fade left_more" id=dataPanel role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">数据操作<h6>(运算时请勿选择空白格以防止错误发生)</h6></h4>
+            </div>
+            <div class="modal-body" id="createContent" style="padding: 10px;">
+                <h4 class="sub-title">原数据</h4>
+                <div id="example" style="overflow: hidden"></div>
+                <h4 class="sub-title">运算结果</h4>
+                <div id="example2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade right" id='groupbyPanel' role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">分组计算</h4>
+            </div>
+            <div class="modal-body"style="padding: 10px;">
+                <div class="card" style="height: 700px;">
+                    <div class="card-body">
+                        <div class="sub-title">维度选择</div>
+                        <div>
+                            <select class="selectpicker" multiple data-live-search="true" style="width: 250px" id="colSelect">
+
+                            </select>
+                        </div>
+                        <div class="sub-title">计算方式</div>
+                        <div>
+                            <select class="selectpicker" data-live-search="true" style="width: 250px" id="groupAction">
+                                    <option value="row:sum">按行求和</option>
+                                    <option value="row:mean">按行求平均</option>
+                                    <option value="row:median">按行求中位数</option>
+                                    <option value="row:min">按行求最小</option>
+                                    <option value="row:max">按行求最大</option>
+                                    <option value="row:count">按行计数</option>
+                            </select>
+                        </div>
+                        <div class="sub-title"></div>
+                        <button class="btn btn-primary" id="handleGroupby">提交</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade right" id='queryPanel' role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">分组计算</h4>
+            </div>
+            <div class="modal-body" style="padding: 10px;">
+                <div class="card" style="height: 700px;">
+                    <div class="card-body">
+                        <div class="sub-title">查询表达式</div>
+                        <input class="form-control" style="width:250px" id="queryCondition"/>
+                        <div class="sub-title">分组选择</div>
+                        <div>
+                            <select class="selectpicker" multiple data-live-search="true" style="width: 250px" id="qcolSelect">
+
+                            </select>
+                        </div>
+                        <div class="sub-title">计算方式</div>
+                        <div>
+                            <select class="selectpicker" data-live-search="true" style="width:250px" id="queryAction">
+                                    <option value="row:sum">按行求和</option>
+                                    <option value="row:mean">按行求平均</option>
+                                    <option value="row:median">按行求中位数</option>
+                                    <option value="row:min">按行求最小</option>
+                                    <option value="row:max">按行求最大</option>
+                                    <option value="row:count">按行计数</option>
+                            </select>
+                        </div>
+                        <div class="sub-title"></div>
+                        <button class="btn btn-primary" id="handleQuery">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block myJavascript %}
+<script src="http://127.0.0.1:8000/static/js/nicescroll.js"></script>
+<script src="http://127.0.0.1:8000/static/js/classie.js"></script>
+<script src="http://127.0.0.1:8000/static/myJs/common.js"></script>
+<script src="http://127.0.0.1:8000/static/myJs/parameter.js"></script>
+<script src="http://127.0.0.1:8000/static/myJs/chartManager.js"></script>
+<script src="http://127.0.0.1:8000/static/js/sylvester.js"></script>
+<script src="http://127.0.0.1:8000/static/js/china.js"></script>
+<script src="http://127.0.0.1:8000/static/js/world.js"></script>
+<script src="http://127.0.0.1:8000/static/js/handsontable.min.js"></script>
+<script src="http://127.0.0.1:8000/static/js/bootstrap-select.min.js"></script>
+
+
+<script type="text/babel">
+
+    var Text = React.createClass({
+
+        getDefaultProps:function(){
+            return{
+                callback:function(){
+                    console.log('no parent');
+                },
+                title:'default',
+                default:'none',
+                specialVal:'',
+                specialTip:'',
+                openSpecial:false
+            }
+        },
+
+        stringToEntity:function (str){
+              var div=document.createElement('div');
+              div.innerText=str;
+              div.textContent=str;
+              var res=div.innerHTML;
+              return res;
+        },
+
+        handleChange:function(){  //处于安全性考虑进行转义
+            this.props.callback(this.stringToEntity(this.refs.textinput.value));
+        },
+
+        setSpecial:function(){
+            this.props.callback(this.props.specialVal);
+        },
+
+        render:function(){
+            var re = <div></div>;
+            if(this.props.openSpecial){
+                re = <button type="button" className="btn btn-success" onClick={this.setSpecial}>{this.props.specialTip}</button>;
+            }
+            return <div><div className="sub-title"></div>
+                <div className="myTitle">{this.props.title}</div>
+                <input className="form-control" ref="textinput" type="text" defaultValue={this.props.default} onChange={this.handleChange}>
+            </input>
+                {re}
+            </div>;
+        }
+    });
+
+    var Slider = React.createClass({
+
+        getDefaultProps:function(){
+            return{
+                callback:function(){
+                    console.log('no parent');
+                },
+                title:'default',
+                sliderID:'slider1',
+                min:'0',
+                max:'100',
+                step:'1',
+                tip:'',
+                unit:'',
+                default:0,
+                style:{width:'50%'},
+                style2:{width:'20%'},
+                specialVal:'',
+                specialTip:'设为默认',
+                openSpecial:false,
+            }
+        },
+
+        getInitialState:function(){
+            var val = 0;
+            if(typeof this.props.default == 'number'){
+                val = this.props.default
+            }
+            else if(this.props.unit!=''){
+                return {
+                    value:Number(this.props.default.replace(this.props.unit,"")),
+                    curNum:Number(this.props.default.replace(this.props.unit,"")),
+                }
+            }
+            return {
+                value:this.props.default,
+                curNum:val
+            }
+        },
+
+        setSpecialVal:function(){
+            var spcl = this.props.specialVal;
+            this.setState({value:spcl});
+            this.props.callback(this.props.specialVal);
+        },
+
+        handleChange:function(){
+            var reactpt = this;
+            this.state.curNum = Number(reactpt.refs.slider.value);
+            this.setState({value:this.state.curNum});
+            if(this.props.unit === ''){
+                this.props.callback(this.state.curNum);
+            }
+            else{
+                this.props.callback(reactpt.refs.slider.value+this.props.unit);
+            }
+        },
+
+        handleChange2:function(){
+            var reactpt = this;
+            if(Number(reactpt.refs.text.value)===NaN)return;
+            this.state.curNum = Number(reactpt.refs.text.value);
+            this.setState({value:this.state.curNum});
+            if(this.props.unit!==''){
+                this.props.callback(reactpt.refs.text.value+this.props.unit);
+            }
+            else{
+                this.props.callback(Number(reactpt.refs.text.value));
+            }
+        },
+
+        render:function(){
+            var dispVal = this.state.value+this.props.unit;
+
+            if(typeof this.state.value === 'string'){
+                this.state.value = Number(this.state.value.replace(this.props.unit,""));
+            }
+
+            if(this.props.openSpecial){
+
+                var defaultInput = <div>
+                <input ref="slider" type="range" onClick={this.handleChange}
+                    defaultValue = {this.state.curNum} style={this.props.style} min={this.props.min} max={this.props.max}/>
+                <input type="text" ref="text" onChange={this.handleChange2} defaultValue={this.state.curNum} style={this.props.style2}/>
+                <input type="button" value={this.props.specialTip}
+                    onClick={this.setSpecialVal}/>
+                </div>;
+            }
+            else{
+                var defaultInput =<div><input ref="slider" type="range" onClick={this.handleChange}
+                    defaultValue = {this.state.curNum} style={this.props.style} min={this.props.min} max={this.props.max}/>
+                    <input type="text" ref="text" onChange={this.handleChange2} defaultValue={this.state.curNum} style={this.props.style2}/>
+                </div>;
+            }
+            return <div>
+                <div className="sub-title"></div>
+                <div className="myTitle">{this.props.title} {dispVal}</div>
+                {defaultInput}
+            </div>
+        }
+    });
+
+    var CheckBox = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                title:'TrueOrFalse?',
+                callback:function(){
+                    console.log('no parent');
+                },
+                default:true
+            }
+        },
+
+        handleChange:function(){
+            this.props.callback(this.refs.checkbox.checked);
+        },
+
+        render:function(){
+            return  <div><div className="sub-title"></div>
+                <div className="checkbox checkbox-success">
+                <input ref="checkbox" className="styled" type="checkbox" defaultChecked={this.props.default} onClick={this.handleChange}/>
+                <label htmlFor="checkbox3">
+                    <div>{this.props.title}</div>
+                </label>
+            </div>
+            </div>;
+        }
+    });
+
+    var ColorPicker = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                title:'color',
+                callback:function(){
+                    console.log('noparent');
+                },
+                default:'#000000',
+                specialVal:'',
+                specialTip:'设为默认',
+                openSpecial:false,
+            }
+        },
+        toTransParent:function(){
+            this.props.callback('transparent');
+        },
+        handleChange:function(){
+            var newColor = this.refs.colorpicker.value;
+            this.props.callback(newColor);
+        },
+        setSpecial:function(){
+            this.props.callback(this.props.specialVal);
+        },
+        render:function(){
+            var re = <div></div>;
+            if(this.props.openSpecial){
+                re = <button className="btn btn-success" onClick={this.setSpecial}>{this.props.specialTip}</button>;
+            }
+            return <div className="aligncenter"><div className="sub-title"></div>
+                <div className="myTitle">{this.props.title}</div>
+                <input ref="colorpicker" type="color" onChange={this.handleChange} defaultValue={this.props.default}/>
+                <button className="btn btn-primary" onClick={this.toTransParent}>设为透明</button>
+                {re}
+            </div>;
+        }
+    });
+
+    var Select = React.createClass({
+        getDefaultProps:function(){
+            return {
+                title:'select',
+                callback:function(){
+                    console.log('select - no parent');
+                },
+                default:'0'
+            }
+        },
+        handleChange:function(){
+            var value = this.refs.select.value;
+            if(value === 'false')value = false;
+            this.props.callback(value);
+        },
+        render:function(){
+            var comp = [];
+            var options = this.props.option;
+            var i =0;
+            for(var n in options){
+                if(options[n]==this.props.default){
+                    comp.push(<option key={this.props.title+i} selected="selected"
+                    value={options[n]}>{n}</option>);
+                }
+                else{
+                    comp.push(<option key={this.props.title+i} value={options[n]}>{n}</option>);
+                }
+                i++;
+            }
+            return <div>
+                <div className="sub-title"></div>
+                <div className="myTitle">{this.props.title}</div>
+                <div>
+                    <select ref="select" onChange={this.handleChange}>
+                        {comp}
+                    </select>
+                </div>
+            </div>
+        }
+    });
+
+    var HeadandEnd = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                default:[],
+                title:[],
+                type:'text',
+                callback:function(){
+                    console.log('no parent');
+                },
+                unit:''
+            }
+        },
+
+        getInitialState:function(){
+            return {
+                value:this.props.default
+            }
+        },
+
+        callback0:function(value){
+            this.state.value[0] = value+this.props.unit;
+            this.props.callback(this.state.value);
+        },
+        callback1:function(value){
+            this.state.value[1]=value+this.props.unit;
+            this.props.callback(this.state.value);
+        },
+
+        render:function(){
+            var react = {};
+            var reactPt = this;
+            var d1 = this.props.default[0],d2 = this.props.default[1];
+            var para0 ={
+                default: typeof d1 == 'string'?d1.replace(this.props.unit,""):d1,
+                title:this.props.title[0],
+                callback:reactPt.callback0
+            }
+            var para1 = {
+                default:typeof d2 == 'string'?d2.replace(this.props.unit,""):d2,
+                title:this.props.title[1],
+                callback:reactPt.callback1
+            }
+            if(this.props.setting == 'text'){
+                 var ele1 = React.createElement(Text,para0);
+                 var ele2 = React.createElement(Text,para1);
+            }
+            react = <div>{ele1}{this.props.unit}
+                        {ele2}{this.props.unit}
+                        </div>
+            return <div>
+                <div className="sub-title"></div>
+                {react}
+            </div>;
+        }
+    });
+
+    var IndexGetter = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                title:[],
+                value:[],
+                callback:function(){}
+            }
+        },
+        handleValue:function(value){
+            this.props.callback(value);
+        },
+        callPanel:function(){
+            $('#'+this.props.name).modal('toggle');
+        },
+        render:function(){
+            var comps = [];
+            for(var i=0;i<this.props.title.length;i++){
+                comps.push(<li key={this.props.name+i}><a onClick={this.handleValue.bind(this,this.props.value[i])}>{this.props.title[i]}</a></li>);
+            }
+            return <div>
+                <div className="sub-title">{this.props.title}</div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.buttonName}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        {comps}
+                    </ul>
+                </div>
+            </div>;
+        }
+    });
+
+    var AxisSelector = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                mode:'x',
+                default:[],
+                callback:function(){
+
+                }
+            }
+        },
+        getInitialState:function(){
+            return {
+                grid:chartManager.Grid.getAll(),
+                value:this.props.default
+            }
+        },
+
+        returnValue:function(value){
+            this.state.value.push(value);
+            this.props.callback(this.state.value);
+            var v = this.state.value;
+            this.setState({ //使其更新
+                value:v
+            });
+        },
+
+        clear:function(){
+            this.setState({ //使其更新
+                value:[]
+            });
+            this.props.callback([]);
+        },
+
+        render:function(){
+            var grids = this.state.grid;
+            var comps = [];
+            for(var i=0;i<grids.length;i++){
+                comps.push(<li><a href="#" onClick = {this.returnValue.bind(this,grids[i].getAxisIndex(this.props.mode))}>{grids[i].gname}</a></li>);
+            }
+            return <div>
+                <div className="sub-title">{this.props.title}</div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">请选择要映射的格栅{this.props.mode}坐标轴<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        {comps}
+                        <li><a href="#" onClick = {this.clear}>清空所选</a></li>
+                    </ul>
+                </div>
+                <div>已选中:{this.state.value} 号轴</div>
+            </div>;
+        }
+    });
+
+    var MultiColor = React.createClass({
+        getDefaultProps:function(){
+            return {
+                default:['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],
+            }
+        },
+        getInitialState:function(){
+            return {
+                value:this.props.default
+            }
+        },
+
+        clear:function(){
+            this.state.value = [];
+            this.refresh();
+            this.props.callback(this.state.value);
+        },
+
+        add:function(value){
+            this.state.value.push(value);
+            this.refresh();
+            this.props.callback(this.state.value);
+        },
+
+        refresh:function(){
+            var v = this.state.value;
+            this.setState({
+                value:v
+            });
+        },
+
+        render:function(){
+
+            var comp = [];
+            var val = this.state.value;
+            for(var i=0;i<val.length;i++) {
+                var bg = {background: val[i], width: '150px', height: '35px', padding: '10px'};
+                comp.push(<li><p style={bg} className="aligncenter">{val[i]}</p></li>)
+            }
+            return <div>
+                <div className="sub-title aligncenter">{this.props.title}</div>
+                <ColorPicker title="添加新颜色" callback={this.add}/>
+                <button onClick={this.clear}>清空调色盘</button>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">已选中颜色<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        {comp}
+                    </ul>
+                </div>
+                <div className="sub-title"></div>
+            </div>;
+        }
+    });
+
+    var DatePicker = React.createClass({
+        getDefaultProps:function(){
+            return {
+                title:'默认标题',
+                value:['2018-1-1','2019-1-1'],
+                callback:function(){}
+            }
+        },
+        getInitialState:function(){
+            return {
+                value:this.props.value
+            }
+        },
+        handleValue:function(value){
+            if(value == 1){
+                this.state.value[0] = this.refs.date1.value;
+            }
+            else if(value == 2){
+                this.state.value[1] = this.refs.date2.value;
+            }
+            this.props.callback(this.state.value);
+        },
+        render:function(){
+            var comps = [];
+            for(var i=0;i<this.props.title.length;i++){
+                comps.push(<li key={this.props.name+i}><a onClick={this.handleValue.bind(this,this.props.value[i])}>{this.props.title[i]}</a></li>);
+            }
+            return <div>
+                <div className="sub-title">{this.props.title}</div>
+                <div>起始日期选择</div>
+                <input type="date" ref="date1" defaultValue={this.props.value[0]} onChange={this.handleValue.bind(this,1)}/>
+                <div>结束日期选择</div>
+                <input type="date" ref="date2" defaultValue={this.props.value[1]} onChange={this.handleValue.bind(this,2)}/>
+            </div>;
+        }
+    });
+
+    var Wrapper = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                initPara:{},
+                callback:function(){
+                    console.log('wrapper - no parent');
+                },
+                title:'展开设置项',
+                style:{padding:'5px'}
+            };
+        },
+
+        extractState:function(obj){
+            var reactPt = this;
+            var state = {};
+            var para = obj.initPara;
+            for(name in para){
+                if(para[name]['type']==='wrapper'){
+                    state[name] = reactPt.extractState(para[name]);
+                }
+                else{
+                    state[name] = para[name]['default'];
+                }
+            }
+            return state;
+        },
+
+        getInitialState:function(){
+            return this.extractState(this.props);
+        },
+
+        makeCallBack:function(stateName){
+            var reactPt = this;
+            return function(value){
+                reactPt.state[stateName] = value;
+                reactPt.handleChange();
+            };
+        },
+
+        handleChange:function(){
+            this.props.callback(this.state);
+        },
+
+        render:function(){
+
+            try {
+                var setting = this.props.initPara;
+                var componentSet = [];
+                var count = 0;
+                for(name in setting){
+                    var flag = false;
+                    var ele={};
+                    var para = setting[name];
+                    para['key'] = this.props.name+count;
+                    para['callback'] = this.makeCallBack(name);
+                    switch(para["type"]){
+                        case 'text':
+                            ele = React.createElement(Text,para);
+                            break;
+                        case 'checkbox':
+                            ele = React.createElement(CheckBox,para);
+                            break;
+                        case 'number':
+                            para['sliderID'] = para['key'];
+                            ele = React.createElement(Slider,para);
+                            break;
+                        case 'colorpicker':
+                            ele = React.createElement(ColorPicker,para);
+                            break;
+                        case 'select':
+                            ele = React.createElement(Select,para);
+                            break;
+                        case 'wrapper':
+                            para['name'] = name;
+                            ele = React.createElement(Wrapper,para);
+                            break;
+                        case 'headandend':
+                            para['name'] = name;
+                            ele = React.createElement(HeadandEnd,para);
+                            break;
+                        case 'axisselector':
+                            para['name'] = name;
+                            ele = React.createElement(AxisSelector,para);
+                            break;
+                        case 'multicolor':
+                            para['name'] = name;
+                            ele = React.createElement(MultiColor,para);
+                            break;
+                        case 'datepicker':
+                            para['name'] = name;
+                            ele = React.createElement(DatePicker,para);
+                            break;
+                        default:
+                            flag = true;
+                            break;
+                    }
+                    if(flag){
+                        continue;
+                    }
+                    componentSet.push(ele);
+                    count++;
+                }
+                return<div className="panel panel-default">
+                        <div className="panel-heading">
+                            <h5 className="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion"
+                                href={'#'+this.props.name+this.props.title}>{this.props.title}</a>
+                            </h5>
+                        </div>
+                        <div id={this.props.name+this.props.title} className="panel-collapse collapse in">
+                            <div class="panel-body" style={this.props.style}>
+                                <div>{componentSet}</div>
+                            </div>
+                        </div>
+                    </div>;
+            }
+            catch(err){
+                console.log(err);
+                return <div>error</div>;
+            }
+        }
+    });
+
+
+
+    //-----------------------------------------以上都是功能组件-----------------------------------------------------
+
+
+    //------------------------------------------一下是可视化系统的界面组件，涉及功能--------------------------------
+
+
+    var Grid = React.createClass({
+
+        setGrid:function(value){
+            console.log(this.props.obj.getAxis('x'));
+            this.props.obj.update(value);
+        },
+
+        deleteGrid:function(){
+            chartManager.Grid.delete(this.props.obj.gname);
+        },
+
+        createAxisOption:function(type){
+
+            var reactPt = this;
+            var cb = function (value) {
+                console.log(value);
+                reactPt.props.obj.setAxis(type,value);
+            };
+            var para = {};
+            para['initPara'] = this.props.obj.getAxisInitPara(type);
+            para['callback'] = cb;
+            para['name'] = this.props.name+'_xaxis';
+            var ele = React.createElement(Wrapper,para);
+            this.refs.axis.innerHTML = "";
+            ReactDOM.render(ele,this.refs.axis);
+        },
+
+        showOption:function(){
+
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.setGrid;
+             para['name'] = this.props.obj.gname;
+             var option = React.createElement(Wrapper,para);
+             ReactDOM.render(option,this.refs.option);
+             $('#'+this.props.obj.gname).modal('toggle');
+        },
+
+        showAxis:function(){
+            this.refs.axis.innerHTML = "";
+            $('#'+this.props.obj.gname+'axis').modal('toggle');
+        },
+        setTick:function(type){
+            var reactPt = this;
+            var cb = function(data){
+                reactPt.props.obj.setAxisTick(type,data);
+            };
+            callDataPanel(cb);
+        },
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.gname}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        <li><a href="#" onClick = {this.showOption}>设置该格栅</a></li>
+                        <li><a href="#" onClick = {this.showAxis}>格栅坐标轴属性设置</a></li>
+                        <li><a href="#" onClick = {this.setTick.bind(this,'x')}>格栅x轴刻度设置</a></li>
+                        <li><a href="#" onClick = {this.setTick.bind(this,'y')}>格栅y轴刻度设置</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#">删除该格栅</a></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={this.props.obj.gname} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">格栅选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade left" id={this.props.obj.gname+'axis'} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">坐标轴管理</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-header"><h4>直角坐标</h4></div>
+                                    <div className="card-body">
+                                        <div>
+                                            <button onClick={this.createAxisOption.bind(this,'x')}>设置x轴</button>
+                                            <button onClick={this.createAxisOption.bind(this,'y')}>设置y轴</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card">
+                                    <div className="card-body" ref="axis">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    });
+
+    var Legend = React.createClass({
+
+        setLegend:function(value){
+            chartManager.setLegend(value);
+        },
+        render:function(){
+            return <div className="card">
+                <div className="card-body">
+                    <Wrapper name={'lgnd'} initPara={chartManager.getLegendInitPara()} callback={this.setLegend}/>;
+                </div>
+            </div>
+        }
+    });
+
+    var ToolBox = React.createClass({
+        setToolBox:function(value){
+            console.log(value);
+            setTimeout(chartManager.setToolBox(value),500);
+        },
+        render:function(){
+            console.log(chartManager.getToolBoxInitPara());
+            return <div className="card">
+                <div className="card-body">
+                    <Wrapper name={'tlbx'} initPara={chartManager.getToolBoxInitPara()} callback={this.setToolBox}/>;
+                </div>
+            </div>;
+        }
+    });
+
+    var DataZoom = React.createClass({
+
+        setDZ:function(value){
+            this.props.obj.update(value);
+        },
+
+        showOption:function(){
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.setDZ;
+             para['name'] = 'wp'+this.props.obj.dzname;
+             var option = React.createElement(Wrapper,para);
+             ReactDOM.render(option,this.refs.option);
+             $('#dz_'+this.props.obj.dzname).modal('toggle');
+        },
+
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.dzname}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        <li><a href="#" onClick={this.showOption}>设置缩放轴外观</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#">删除</a></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={'dz_'+this.props.obj.dzname} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">可视映射选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+    });
+
+    var VisualMap = React.createClass({
+
+        callback:function(value){
+            value['min'] = Number(value['min']);
+            value['max'] = Number(value['max']);
+            try{
+                value['inRange']['colorLightness'][0] = Number(value['inRange']['colorLightness'][0]);
+                value['inRange']['colorLightness'][1] = Number(value['inRange']['colorLightness'][1]);
+            }catch(e){
+                console.log(e);
+            }
+            console.log(value);
+            this.props.obj.update(value);
+        },
+
+        setSeries:function(value){
+            this.props.obj.update({seriesIndex:value});
+            console.log(this.props.obj);
+            chartManager.renew();
+        },
+
+        callPanel:function(){
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.callback;
+             para['name'] = 'vm'+this.props.obj.name;
+             var s = chartManager.Visualizations.getAll();
+             var tt = [],v = [];
+             for(var i=0;i<s.length;i++){
+                 tt[i] = s[i]['vname'];
+                 v[i] = s[i]['index'];
+             }
+             var reactComp = [];
+             var option = React.createElement(Wrapper,para);
+             reactComp.push(<IndexGetter title={tt} value={v} callback={this.setSeries} name={'idl'+this.props.obj.name} buttonName={'选择映射的维度'}/>);
+             reactComp.push(<button onClick={this.setSeries.bind(this,"all")}>设置到全体映射</button>);
+             reactComp.push(option);
+             ReactDOM.render(<div>{reactComp}</div>,this.refs.option);
+             $('#'+'vsm'+this.props.obj.name).modal('toggle');
+        },
+
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.name}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        <li><a href="#" onClick={this.callPanel}>设置视觉映射外观</a></li>
+                        <li className="divider"></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={'vsm'+this.props.obj.name} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">可视映射选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+    });
+
+    var Title = React.createClass({
+
+        getDefaultProps:function () {
+            return{
+                style:{
+                    borderStyle:'solid',
+                    borderWidth:'1px',
+                }
+            }
+        },
+
+        setTitle:function(value){
+            console.log(value);
+            this.props.obj.update(value);
+        },
+
+        showOption:function(){
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.setTitle;
+             para['name'] = this.props.obj.tname;
+             var option = React.createElement(Wrapper,para);
+             ReactDOM.render(option,this.refs.option);
+             $('#'+this.props.obj.tname).modal('toggle');
+        },
+
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.tname}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu">
+                        <li><a href="#" onClick = {this.showOption}>设置该标题</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#">删除该标题</a></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={this.props.obj.tname} role="dialog">
+                    <div className="modal-dialog modal-lg" style={this.props.modalStyle}>
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">标题选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    });
+
+    var Visualization = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                obj:{},
+                style:{length:"100px"}
+            }
+        },
+
+        callback:function(value){
+            this.props.obj.update(value);
+        },
+
+        callDataPanel:function(){
+            var reactPt = this;
+            var dataCallBack = function(result){
+                reactPt.props.obj.setData(result);
+            };
+            callDataPanel(dataCallBack,this.props.obj.vname);
+        },
+
+        deleteMe:function(){
+            chartManager.Visualizations.delete(this.props.obj.vname);
+        },
+
+        showOption:function(){
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.callback;
+             para['name'] = this.props.obj.vname;
+             var option = React.createElement(Wrapper,para);
+             this.refs.option.innerHTML = "";
+             ReactDOM.render(option,this.refs.option);
+             $('#'+this.props.obj.vname).modal('toggle');
+        },
+
+        showMarkPanel:function(){
+            $('#'+this.props.obj.vname+'mark' ).modal('toggle');
+        },
+
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.vname}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu"  style={this.props.length}>
+                        <li><a href="#" onClick = {this.showOption}>设置该可视化</a></li>
+                        <li><a href="#" onClick = {this.callDataPanel}>更新修改可视化数据</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#" onClick = {this.showMarkPanel}>进行点标注</a></li>
+                        <li><a href="#" onClick = {this.showMarkPanel}>进行线标注</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#" onClick={this.deleteMe}>删除该可视化</a></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={this.props.obj.vname} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">可视化选项选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="sub-title">&nbsp;&nbsp;&nbsp;类型:{this.props.obj.type}</div>
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade left" id={this.props.obj.vname+'mark'} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">标注设置</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    });
+
+    //--------------------------------这是几种轴组件--------------------------------------------------
+
+    var Axis = React.createClass({
+        getDefaultProps:function(){
+            return {
+                obj:{},
+                style:{length:"100px"},
+                type:''
+            }
+        },
+        showOption:function(){
+             var para = {};
+             para['initPara'] = this.props.obj.getInitPara();
+             para['callback'] = this.callback;
+             para['name'] = this.props.obj.aname;
+             var option = React.createElement(Wrapper,para);
+             ReactDOM.render(option,this.refs.option);
+             $('#'+this.props.obj.aname).modal('toggle');
+        },
+        callback:function(value){
+            console.log(value);
+            this.props.obj.update(value);
+        },
+        render:function(){
+            return <div>
+                <div className="btn-group open">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">{this.props.obj.aname}<span className="caret"></span></button>
+                    <ul className="dropdown-menu" role="menu"  style={this.props.length}>
+                        <li><a href="#" onClick={this.showOption}>设置该组件</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#">删除该组件</a></li>
+                    </ul>
+                </div>
+                <div className="modal fade left" id={this.props.obj.aname} role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">选项</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="sub-title">&nbsp;&nbsp;&nbsp;类型:{this.props.obj.type}</div>
+                                    <div className="card-body" ref="option">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+    });
+
+
+    //-----------------------------------上面是几种轴组件---------------------------------------------
+
+    var MarkCreatePanel = React.createClass({
+
+        getInitialState:function(){
+            return {
+            }
+        },
+
+        render:function(){
+            return ;
+        }
+    });
+
+    var createPrototype = {
+        getDefaultProps:function(){
+            return {
+                style:{width:"50%"},
+                createFunc:function(){return false;}
+            };
+        },
+        handleCreate:function(){
+            var newname = this.refs.newName.value;
+            if(newname === ''){
+                myAlert('请输入内容');
+                return ;
+            }
+            if(this.props.createFunc(newname)){
+                myOkAlert('创建成功!');
+                $('#createPanel').modal('hide');
+            }else{
+                myAlert('创建失败，名字存在重复');
+            }
+        },
+        render:function(){
+            return <div className="card">
+                <div className="card-body" id="createContent">
+                    <div className="sub-title">{this.props.title}</div>
+                    <input type="text" className="form-control" ref="newName" style={this.props.style}/>
+                    <div className="sub-title"></div>
+                    <button type="button" className="btn btn-success" onClick={this.handleCreate}>创建</button>
+                </div>
+            </div>
+        }
+    };
+
+    var dataZoomCreate = cloneObj(createPrototype);
+    dataZoomCreate.render = function(){
+        return <div className="card">
+            <div className="card-body" id="createContent">
+                <div className="sub-title">创建新缩放轴</div>
+                 <div className="sub-title"></div>
+                    <select data-live-search="true"  id="groupAction">
+                        <option value="row:sum">x轴</option>
+                        <option value="row:mean">y轴</option>
+                    </select>
+                <div className="sub-title">缩放轴名称</div>
+                <input type="text" className="form-control" style={this.props.style} ref="newName"/>
+                <button type="button" className="btn btn-success" onClick={this.handleCreate}>创建</button>
+            </div>
+        </div>;
+    };
+    dataZoomCreate.handleCreate = function(){
+        alert('hi!');
+        if(this.refs.newName.value==""){  //我取这么乱的ID就是为了这个页面不会有一样的id....
+            myAlert('请输入名字');
+        }
+        else{
+            var $dom = $(this.refs.selectedVal);
+            var val = $dom.val();
+            if(chartManager.DataZoom.create(this.refs.newName.value,val)){
+                myOkAlert('创建成功!');
+            }
+        }
+    };
+
+    var SimpleCreate = React.createClass(createPrototype);
+    var DataZoomCreate = React.createClass(dataZoomCreate);
+
+    //---------------初始化---对不同功能面板进行设置--------------------------------------------------------------
+
+    //图表组件初始化
+    var chart = echarts.init($('#chart').get(0));
+    var chartManager = ChartManager(chart);
+    currentChartManager = chartManager;
+    DataManager.count = chartManager.getResultCount();
+
+    //------------------保存按钮-------------------------------------------
+    $('#saveChart').click(function(){
+        chartManager.saveChart();
+    });
+    //------------------------------------------------------------------------
+
+    $('#btnPanel').niceScroll({ //滑动轴初始化
+        cursorcolor: "#ccc",//#CC0071 光标颜色
+        cursoropacitymax: 1, //改变不透明度非常光标处于活动状态（scrollabar“可见”状态），范围从1到0
+        touchbehavior: false, //使光标拖动滚动像在台式电脑触摸设备
+        cursorwidth: "4px", //像素光标的宽度
+        cursorborder: "0", // 游标边框css定义
+        cursorborderradius: "5px",//以像素为光标边界半径
+        autohidemode: false //是否隐藏滚动条
+    });
+
+    function refreshPanel(type){
+        if(type=='titles'){
+            function createFunc(value) {
+                return chartManager.Title.create(value);
+            }
+            ReactDOM.render(<FunctionPanel
+            Type = {Title} initSet={chartManager.Title.getAll()} indexName = {'tname'} key={'title'} title={'标题'}
+            createFunc = {createFunc} createPanel={SimpleCreate}
+            />,$('#functionPanel').get(0));
+        }
+        else if(type=='grids'){
+            function createFunc(value){
+                var result = chartManager.Grid.create(value);
+                return result;
+            }
+            ReactDOM.render(<FunctionPanel
+            Type = {Grid} initSet={chartManager.Grid.getAll()} indexName = {'gname'} key={'grid'} title={'格栅'}
+            createFunc = {createFunc} createPanel={SimpleCreate}
+            />,$('#functionPanel').get(0));
+        }
+        else if(type=='dataZoom'){
+            ReactDOM.render(<FunctionPanel
+            Type = {DataZoom} initSet={chartManager.DataZoom.getAll()} indexName = {'dzname'} key={'dtzoom'} title={'缩放轴'}
+            createPanel={DataZoomCreate}
+            />,$('#functionPanel').get(0));
+        }
+        else if(type=='visualization'){
+            ReactDOM.render(<FunctionPanel
+            Type = {Visualization} initSet={chartManager.Visualizations.getAll()} indexName = {'vname'} key={'v'} title={'可视化'}
+            />,$('#functionPanel').get(0));
+        }
+        else if(type=='visualMap'){
+            var set = chartManager.VisualMap.getAll();
+            var count = 0;
+            for(name in set){
+                set[name]['name'] = '映射'+count++;
+            }
+            function create(){
+                chartManager.VisualMap.create();
+                return true;
+            }
+            ReactDOM.render(<FunctionPanel
+            Type = {VisualMap} initSet={set} indexName = {'name'} key={'vm'} title={'视觉映射'} createFunc = {create}/>
+                ,$('#functionPanel').get(0));
+        }
+    };
+
+    //标题初始化
+    $('#titles').click(function(){
+        refreshPanel('titles');
+    });
+    //grid
+    $('#grids').click(function(){
+        refreshPanel('grids');
+    });
+    //dataZoom
+    $('#dataZoom').click(function(){
+        refreshPanel('dataZoom');
+    });
+    //visualizations
+    $('#visualizations').click(function(){
+        refreshPanel('visualization');
+    });
+    //legend
+    $('#legend').click(function(){
+        $('#publicTitle').get(0).innerHTML = "图例设置";
+        ReactDOM.render(<Legend/>,$('#publicContent').get(0));
+        $('#publicPanel').modal('toggle');
+    });
+    //提示框样式设置
+    $('#tooltip').click(function(){
+        function cb(value){
+            chartManager.setToolTip(value);
+        }
+        $('#publicTitle').get(0).innerHTML = "悬浮窗设置";
+        ReactDOM.render(
+                <div className="card">
+                    <div className="card-body">
+                         <Wrapper name={'stltips'} initPara={chartManager.getToolTipInitPara()} callback={cb} />
+                    </div>
+                </div>
+            ,$('#publicContent').get(0));
+        $('#publicPanel').modal('toggle');
+    });
+    //toolbox
+    $('#toolbox').click(function(){
+        $('#publicTitle').get(0).innerHTML = "工具栏设置";
+        ReactDOM.render(<ToolBox/>,$('#publicContent').get(0));
+        $('#publicPanel').modal('toggle');
+    });
+    //visualMAP
+    function setVMpanel(){
+        $('#currentOption').get(0).innerHTML = "视觉映射";
+        var set = chartManager.VisualMap.getAll();
+        var compset = [];
+        for(var i=0;i<set.length;i++){
+            compset.push(<VisualMap name={"映射"+(i+1)} obj={set[i]}/>);
+        }
+        function create(){
+            chartManager.VisualMap.create();
+            return true;
+        }
+        compset.push(<button className="btn btn-info" onClick={create}>新建</button>);
+        ReactDOM.render(<div>{compset}</div>,$('#react').get(0));
+    }
+    $('#visualMap').click(function(){
+        refreshPanel('visualMap');
+    });
+    function refreshPanel2(type){
+        switch (type){
+            case 'visualMap':
+                setVMpanel();
+                break;
+        }
+    };
+    //画布设置
+    $('#canvas').click(function(){
+        $('#publicTitle').get(0).innerHTML = "画布设置";
+        var cb = function(value){
+            chartManager.setBgColor(value);
+        };
+        var cb2 = function(value){
+            chartManager.setColors(value);
+        };
+        var style = {height:'1000px'};
+        var html =
+            <div className="card" style={style}>
+                <div className="card-body">
+                    <div className="sub-title"></div>
+                    <div className="panel aligncenter">
+                        <ColorPicker  title="背景颜色设置" callback={cb} default={chartManager.getBgColor()}/>
+                        <MultiColor title="调色板设置" callback={cb2} default={chartManager.getColors()}/>
+                    </div>
+                </div>
+            </div>;
+        ReactDOM.render(html,$('#publicContent').get(0));
+        $('#publicPanel').modal('toggle');
+    });
+
+{#    function cb(value){#}
+{#        console.log(value);#}
+{#    }#}
+{#    ReactDOM.render(<DatePicker callback={cb}/>,$('#react').get(0));#}
+
+setTimeout(function(){
+{#    chartManager.Title.create('cwjghg');#}
+{#    chartManager.bar.create('bar1','数据1',chartManager.Grid.get('grid0'));#}
+{#    chartManager.bar.create('bar2','数据2',chartManager.Grid.get('grid0'));#}
+{#    chartManager.pie.create('pie1','数据3');#}
+{#    chartManager.pie.create('pie3','数据4');#}
+{#    chartManager.Visualizations.get('bar1').setData([123,110,123,60,80,515]);#}
+{#    chartManager.Visualizations.get('bar2').setData([123,41,123,44,123,551]);#}
+},2000);
+
+
+
+
+var FunctionPanel = React.createClass({
+
+    getDefaultProps:function(){
+        return {
+            style:{height:'600px'},
+            createFunc:function(){alert('hi!!')},
+            createPanel:""
+        }
+    },
+
+    callCreate:function(){
+
+        if(this.props.createPanel==""){  //基础的创建方式
+            if(this.props.createFunc()){
+                alert('创建完成');
+            }
+            return ;
+        }
+
+        var para = {
+            title:'创建'+this.props.title,
+            createFunc:this.props.createFunc
+        };
+        $('#createContent').get(0)
+        var ele = React.createElement(this.props.createPanel,para);
+        ReactDOM.render(ele,$('#createContent').get(0));
+         $('#createPanel').modal('toggle');
+    },
+
+    render:function(){
+
+        var set = this.props.initSet;
+        var indexName = this.props.indexName;
+        var Type = this.props.Type;
+        var reactComp = [];
+        for(var i in set){
+            var para = {
+                obj:set[i],
+                key:this.props.key+"_"+set[i][indexName]
+            };
+            var ele = React.createElement(Type,para);
+            reactComp.push(ele);
+        }
+
+        return <div>
+                <div className="card">
+                <div className="card-header">
+                    <div className="card-title">
+                        <div className="title" ref="title">{this.props.title}</div>
+                    </div>
+                    <div className="pull-right card-action">
+                        <div className="btn-group" role="group" aria-label="...">
+                            <button type="button" className="btn btn-link" ref="createBtn" onClick={this.callCreate}><i className="fa fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div className="card-body" style={this.props.style} ref="components">
+                    {reactComp}
+                </div>
+            </div>
+             <div className="modal fade left" role="dialog">
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 className="modal-title">新建</h4>
+                        </div>
+                        <div className="modal-body no-padding" ref="createPanel">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>;
+    }
+});
+
+</script>
+
+{% endblock %}

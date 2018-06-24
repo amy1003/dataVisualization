@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+
+{% block myCss %}
+    <style type="text/css">
+
+        .aligncenter {
+            clear: both;
+            display: block;
+            margin:auto;
+        }
+
+        .mybtn{position:fixed; right:10px; bottom:20px; display:block; width:50px; height:50px;border-radius:50px; padding:0px; text-align:center; line-height:50px;}
+
+
+        .modal-dialog{
+            z-index: auto;
+        }
+
+        .modal.left .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 20%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: auto;
+        }
+
+        .modal.right .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 21%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: auto;
+        }
+
+        .modal.left .modal-content,
+        .modal.right .modal-content {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .modal.left .modal-body,
+        .modal.right .modal-body {
+            padding: 15px 15px 80px;
+        }
+
+        /*Middle*/
+
+
+        /*Left*/
+        .modal.left.fade .modal-dialog{
+            left: -320px;
+            -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                    transition: opacity 0.3s linear, left 0.3s ease-out;
+        }
+
+        .modal.left.fade.in .modal-dialog{
+            left: 0;
+        }
+
+        /*Right*/
+        .modal.right.fade .modal-dialog {
+            right: -320px;
+            -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+                    transition: opacity 0.3s linear, right 0.3s ease-out;
+        }
+
+        .modal.right.fade.in .modal-dialog {
+            right: 0;
+        }
+
+        /* ----- MODAL STYLE ----- */
+        .modal-content {
+            border-radius: 0;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom-color: #EEEEEE;
+            background-color: #FAFAFA;
+        }
+
+    </style>
+{% endblock %}
+
+{% block mainContent %}
+
+    <div class="col-lg-12">
+        <div class="col-lg-12">
+            <div class="panel">
+                <button type="button" class="btn btn-link">工具栏&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-link" id="search">搜索&nbsp;&nbsp;<i class="fa fa-search"></i></button>
+                    <input type="text">
+                    <button type="button" class="btn btn-link" id="openGuide">新建数据画板&nbsp;&nbsp;<i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-link" id="refresh">显示所有画板&nbsp;&nbsp;<i class="fa fa-refresh"></i></button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle"  data-toggle="dropdown" id="sort">排序&nbsp;&nbsp;<i class="fa fa-sort-amount-asc"></i></button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">按名称</a></li>
+                            <li><a href="#">按上传时间</a></li>
+                            <li><a href="#">按类型</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle"  data-toggle="dropdown" id="sort">筛选&nbsp;&nbsp;<i class="fa fa-filter"></i></button>
+                        <ul class="dropdown-menu" role="menu">
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chartIndexHolder"></div>
+
+    </div>
+
+    </div>
+{% endblock %}
+
+{% block FunctionalModal %}
+    <div class="modal fade" id="guidePanel1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新建数据画板</h4>
+                </div>
+                <div class="modal-body no-padding">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">
+                                第一步 选择数据集
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="thumbnail">
+                                    <img src="static/img/exist.png" class="img-responsive" height="250px" width="250px">
+                                    <div class="caption">
+                                        <h3>已有数据源<a class="anchorjs-link" href="#thumbnail-label"><span class="anchorjs-icon"></span></a></h3>
+                                        <p><a href="#" class="btn btn-info" role="button" id="toStep2">选择</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="thumbnail">
+                                    <img src="static/img/plus.png" class="img-responsive" height="250px" width="250px">
+                                    <div class="caption">
+                                        <h3>上传新数据源<a class="anchorjs-link" href="#thumbnail-label"><span class="anchorjs-icon"></span></a></h3>
+                                        <p><a href="/dataset" class="btn btn-info" role="button">选择</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sub-title"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="modal fade" id="guidePanel3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新建数据画板</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">
+                                第二步 画板命名&nbsp;<div style="font-size: 12px">&nbsp;&nbsp;名字在10个字符内</div>
+                                <div style="font-size: 12px;color: red;" id="showSelected"></div>
+                            </div>
+                            <div><input type="text" class="form-control" id="newName"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="handleCreate">创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade right" id="guidePanel2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" data-backdrop="false">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">数据集 选择进行下一步</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="card" id="datasetHolder">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block myJavascript %}
+    <script type="application/javascript" src="static/myJs/common.js"></script>
+    <script src="{{ host }}/static/js/china.js"></script>
+    <script src="{{ host }}/static/js/world.js"></script>
+    <script type="text/babel">
+
+    //全局变量
+    var selectedDataset = "";
+    //选择初始化
+    $('#list1').get(0).setAttribute('class','active');
+    //按键初始化
+    $('#openGuide').click(function(){
+       $('#guidePanel1').modal('toggle');
+    });
+    $('#toStep2').click(function(){
+        getDataset();
+        $('#guidePanel2').modal('toggle');
+    });
+
+    //初始获取所有图表格
+    getCharts();
+
+     //创建新表按钮
+    $('#handleCreate').click(function(){
+        var newname = $('#newName').val();
+        if(newname.length > 10){
+            myAlert('名字超过限制长度');
+            return;
+        }
+        var dataset = selectedDataset;
+        createNewChart(newname,dataset);
+    });
+
+    //获取所有数据集合
+    function getDataset(){
+        simpleGet(api.getAllDataset).then(function(result){
+            var objs = JSON.parse(result);
+            console.log(objs);
+            var cs = [];
+            for(name in objs){
+                console.log(name)
+                var obj = objs[name];
+                cs.push(<Dataset time={obj['time']} datatype={obj['type']} size={obj['size']} name={name} id={name+'_id'}/>)
+            }
+            $("#datasetHolder").get(0).innerHTML = "";
+            ReactDOM.render(<div>{cs}</div>,$('#datasetHolder').get(0));
+        });
+    }
+
+    //获取图表
+
+     function getCharts(filter){
+
+        if(filter!=null){}
+        simpleGet('getCharts').then(function(result){
+            var charts = JSON.parse(result);
+            console.log(charts);
+            var chartset = [];
+            for(name in charts){
+                chartset.push(
+                    <ChartIndex name={name}/>
+                )
+            }
+            $('#chartIndexHolder').get(0).innerHTML="";
+            ReactDOM.render(<div>{chartset}</div>,$('#chartIndexHolder').get(0));
+        });
+     }
+    //创建新表
+
+    function createNewChart(newname,dataset){
+        simplePost(api.createNewChart,{name:newname,dataset:dataset}).then(function(result){
+            if(result=='true'){
+                myOkAlert('图表创建完成!');
+                $('#guidePanel3').modal('hide');//写的这么混杂我不知道好不好??
+                getCharts();
+            }
+            else{
+                myAlert(result);
+                getCharts();
+            }
+        });
+    }
+
+    var Dataset = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                dataprefix:'static/img/',
+                datatype:'',
+                datachoice:{
+                    excel:'xlsx.png',
+                    txt:'txt.png',
+                    csv:'csv.png'
+                },
+                name:'',
+                size:'',
+                time:'',
+                style:{
+                    'fontSize':'16px'
+                },
+                id:''
+            };
+        },
+
+        selectMe:function(){
+            selectedDataset = this.props.name;
+            $('#showSelected').get(0).innerHTML = '您已选择'+selectedDataset;
+            $('#guidePanel1').modal('hide');
+            $('#guidePanel2').modal('hide');
+            $('#guidePanel3').modal('toggle');
+        },
+
+         truncateName:function(str){
+            if(str.length>15){
+                return str.substr(0,8)+".."
+            }
+            else return str;
+        },
+
+        showDetail:function(){
+            normalAlert("数据类型: "+this.props.datatype+'        \n大小:'+this.props.size+"         " +
+                "\n创建时间:"+this.props.time);
+        },
+
+        render:function(){
+            return  <div className="card">
+                    <div className="col-lg-12">
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">
+                                    <div className="title" data-toggle="tooltip" title={this.props.name}>{this.truncateName(this.props.name)}</div>
+                                </div>
+                            </div>
+                            <div className="card-body">
+                                <img src={this.props.dataprefix+this.props.datachoice[this.props.datatype]} height="50px" width="50px"></img>
+                            </div>
+                            <div className="card-footer pull-right">
+                                <button type="button" className="btn btn-link" onClick={this.showDetail}>详细&nbsp;&nbsp;<i className="fa fa-search"></i></button>
+                                <button type="button" className="btn btn-link" onClick={this.selectMe}>选择&nbsp;&nbsp;<i className="fa fa-check"></i></button>
+                            </div>
+                        </div>
+                    </div>
+            </div>;
+        }
+    });
+
+    var ChartIndex = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                windowStyle:{borderStyle:"solid",borderWidth:"5px"},
+                chartStyle:{height:"450px",width:"500px"}
+            };
+        },
+        callPanel:function(){
+            window.location.href = 'editPanel/'+this.props.name;
+        },
+
+        componentDidMount:function(){
+            var reactPt = this;
+            simplePost(api.getChartOption,{chartName:this.props.name},false).then(function(result){
+                if(result==''){
+                    return;
+                }
+                var MainChart = JSON.parse(result);
+                var chart = echarts.init(reactPt.refs.chart);
+                chart.setOption(MainChart);
+            });
+        },
+
+        delete:function(){
+            var reactPt = this;
+            if(confirm("确定要删除该表吗???")){
+                simplePost(api.deleteChart,{chartname:reactPt.props.name}).then(function(result) {
+                    if (result == 'true') {
+                        myOkAlert("删除成功!");
+                        $('#chartIndexHolder').innerHTML = "";
+                        getCharts();
+                    }
+                    else{
+                        myAlert("删除失败");
+                    }
+                });
+            }
+        },
+
+        render:function (){
+            return <div className="col-xs-6">
+            <div className="card" style={this.props.windowStyle}>
+                <div className="card-header">
+                    <div className="card-title">
+                        <div className="title">{this.props.name}</div>
+                    </div>
+                    <div className="pull-right card-action" >
+                        <div className="btn-group" role="group">
+                            <button type="button" className="btn btn-link" onClick={this.callPanel}><i className="fa fa-search"></i></button>
+                            <button type="button" className="btn btn-link" onClick={this.delete}><i className="fa fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style={this.props.chartStyle} ref="chart" className="aligncenter"></div>
+
+                </div>
+            </div>
+
+        </div>;
+        }
+    });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ appTitle }}</title>
+    <style>
+        body { margin: 0; }
+
+        /*sliding navigation between the slides*/
+        ul {
+            -webkit-perspective: 1000;
+            -webkit-backface-visibility: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            left:0;
+
+            height:100vh;
+
+
+            list-style-type: none;
+            overflow: hidden;
+
+            -webkit-perspective: 1000;
+            -webkit-backface-visibility: hidden;
+
+        }
+
+        li {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+
+            float: left;
+            width: 100vw;
+            height: 100%;
+            color: #000;
+            text-align: center;
+
+        }
+
+        #blackcover{ height: 100vh; width: 100vw; position: absolute; background-color: #2B2B2B; z-index: 1; color: #FFF; display: block; }
+        .b2{ background-color: #69428B; }
+        .b3{ background-color: #46537A; }
+        h1{ font-family: "寰蒋闆呴粦"; padding-top: 30px; color:#fff }
+        /*end of sliding navigation between the slides*/
+        .aligncenter {
+            clear: both;
+            display: block;
+            margin:auto;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{{host}}/static/lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}/static/lib/css/font-awesome.min.css">
+</head>
+
+<body>
+    <ul id="showList">
+        <li>
+            <div id="blackcover">
+                <h3 style="color:#fff">可视化应用</h3>
+				<h1 style="color:#fff;font-size:150px;" id="appname">{{ appTitle }}</h1>
+                <h1 style="color:#fff">请右滑观看→</h1>
+                <h1></h1>
+                <button class="btn btn-info btn-lg" id="run">启动应用</button>
+                <button class="btn btn-warning btn-lg" id="stop">停止应用</button>
+			</div>
+        </li>
+    </ul>
+
+</body>
+
+<script src="{{host}}/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="{{host}}/static/js/echarts.js"></script>
+<script src="{{host}}/static/myJs/newChartManager.js"></script>
+<script src="{{host}}/static/myJs/common.js"></script>
+<script type="text/javascript" src="{{host}}/static/lib/js/bootstrap.min.js"></script>
+<script src="{{host}}/static/js/china.js"></script>
+<script src="{{host}}/static/js/world.js"></script>
+
+<script>
+
+    var appname = {{ '"'}}{{ appTitle }}{{ '"' }};
+
+    var width = document.body.clientWidth;
+    var height = $(document).height() ;
+
+    var tmpBg = {}//测试用
+
+    var playSeries = []; //setInterval 序列,用来控制运行
+
+    var chartsList = {};
+
+    var defaultBg = {
+        width:1536,
+        height:742,
+        color:'transparent'
+    };
+
+    var createChartOption = function(){
+
+        var option = {
+            width:500,
+            height:500,
+            top:0,
+            left:0,
+            interval:3,
+            grid:1,
+            position:'absolute'
+        };
+        return option;
+    };
+
+    var setBg = function(height,width,color){
+        $('#bg').css('height',height);
+        $('#bg').css('width',width);
+        $('#bg').css('background-color',color);
+    };
+
+    $(window).resize(function(){ //自适应
+        for(var i=0;i<playSeries.length;i++){
+            clearInterval(playSeries[i]);
+        }
+        width = document.body.clientWidth;
+        height = $(document).height() ;
+        for(name in chartsList){
+            var manager = chartsList[name];
+            manager.resize();
+        }
+    });
+
+    $('#run').click(function(){
+        runApp();
+    });
+
+    $('#stop').click(function(){
+        stopApp();
+    });
+
+    function initialize(){
+        //获取应用的数据----------------------------------------------
+        simplePost(api.getApplication,{appname:appname}).then(function(result){
+            var r =JSON.parse(result);
+            console.log(r);
+            var bg = r['bg'];
+
+            if(bg==""){
+                bg = defaultBg;
+            }else{
+                bg = JSON.parse(r['bg']);
+            }
+            //设置背景
+
+            bgColor = bg['color'];
+
+            //初始化图像
+            var charts = r['charts'];
+            for(name in charts){
+                if(name=='应用展示')continue;
+                var chart = JSON.parse(charts[name]);
+                if(!chart.hasOwnProperty('app')){
+                    chart['app'] = createChartOption();
+                }
+                chartsList[name] = new Chart(name,chart['app'],chart);
+
+                chartsList[name].render();
+            }
+
+            $("ul").initslide(
+                {}
+            );//initialize itemslide
+        });
+    }
+
+    initialize();
+
+    //---------------------------------------------------------
+        function  createRun(name,manager,interval) {
+        return function(){
+            var timer = runApplication(name,manager,interval);
+            playSeries.push(timer);
+        }
+    }
+
+    function runApp(){
+        alert('应用已经启动!');
+        var time = 0;
+        for(name in chartsList){
+
+            var manager = chartsList[name].getManager();
+            var interval = chartsList[name].props.interval;
+            setTimeout(createRun(name,manager,interval),time);
+            time+=1000;
+        }
+    };
+
+    function runApplication(chartname,chartManager,interval){
+
+        var doptstr = JSON.stringify(chartManager.getDataOptions());
+        console.log(chartname);
+        var timer = setInterval(function(){
+            simplePost(api.runDataOption,{'chartname':chartname,'dataoption':doptstr,'miliTime':chartManager.getMiliTime()}).then(function(result){
+                var obj = JSON.parse(result);
+                if(obj.hasOwnProperty('status')&&obj['status']=='false'){
+                    console.log('no update');
+                    return ;
+                }
+                else{
+                    console.log(obj);
+                    for(name in obj){
+                        if(name=='app_data_miliTime'){
+                            chartManager.setMiliTime(obj[name]);
+                            continue;
+                        }
+                        chartManager.visualization.setDataTo(name,obj[name]);
+                    }
+                }
+            });
+        },Number(interval)*1000);
+        return timer;
+    }
+
+    function stopApp(){ //停止运行
+        for(var i=0;i<playSeries.length;i++){
+            clearInterval(playSeries[i]);
+        }
+        alert('应用已经暂停');
+    }
+
+     //chart 对象
+     var Chart = function(id,props,Mainchart){
+         //id
+         this.id = id;
+         //拖动网格
+         this.props = props; //grid top left width height interval
+         //主体
+         this.Mainchart = Mainchart;
+
+         this.chartManager = {};
+
+         //画图
+         this.render = function(){ //render有些不一样
+
+             var div = "<li>"+"<div id=" + this.id + ">"+ "</div>"+"</li>";
+
+             $('#showList').append(div);
+             $('#'+this.id).css('width',width);
+             $('#'+this.id).css('height',height);
+             $('#'+this.id).css('background-color','#515151');
+             var chart = {};
+             if(!this.Mainchart.hasOwnProperty('theme')||this.Mainchart.theme=='default'){
+                 chart = echarts.init($('#'+this.id).get(0));
+             }
+             else{
+                 chart = echarts.init($('#'+this.id).get(0),this.Mainchart.theme);
+             }
+             this.chart = chart;
+             this.chartManager = createChartManager(chart,this.Mainchart,{},this.id); //不需要getParas
+             try{
+                this.chartManager.visualization.update('scatter1',{symbolSize:function(value){
+                    return value[2]/50+12;
+                }});
+                this.chartManager.visualization.update('escatter1',{symbolSize:function(value){
+                    return value[2]/40+12;
+                }});
+             }catch (e){
+                 console.log(e);
+             }
+             this.chartManager.renew();
+
+         };
+         //去除图像
+         this.deRender = function(){
+            $('#'+this.id).remove();
+         };
+
+         this.getProps = function(){
+            return this.props;
+         };
+         this.resize = function(){
+             $('#'+this.id).css('width',width);
+             $('#'+this.id).css('height',height);
+             this.chart.resize();
+         };
+         this.setProps = function(newVal){
+            this.props = newVal;
+            var obj =this;
+            $('#'+this.id).draggable({
+                 grid:[this.props.grid,this.props.grid],
+                 containment:'parent',
+                 stop:function(){
+                     obj.props.top = $('#'+this.id).css('top');
+                     obj.props.left = $('#'+this.id).css('left');
+                     console.log(obj.props);
+                 }
+             });
+            $('#'+this.id).css(this.props);
+            this.chart.resize();
+         };
+         this.getManager = function(){
+             return this.chartManager;
+         };
+     };
+
+
+{#     var mychart = echarts.init(document.getElementById('canvas'));#}
+{#     mychart.setOption(option4);#}
+{#     $( "#canvas" ).draggable({  grid: [ 10, 10 ],containment: "parent"});#}
+
+
+{#    setTimeout(function(){#}
+{#        $('#canvas').css('height','450px');#}
+{#        $('#canvas').css('width','450px');#}
+{#        mychart.resize();#}
+{#    },3000)#}
+{##}
+{#    setTimeout(function(){#}
+{#        $( "#canvas" ).draggable({  grid: [ 100, 100 ],containment: "parent" });#}
+{#        alert($('#canvas').css('left'));#}
+{#        alert($('#canvas').css('top'));#}
+{#        $('#canvas').css('left','600px');#}
+{#        $('#canvas').css('top','600px');#}
+{#    },6000);#}
+
+
+</script>
+<script type="text/javascript" src="{{host}}/static/js/hammer.js"></script>
+<script type="text/javascript" src="{{host}}/static/js/itemslide.min.js"></script>
+<script type="text/javascript" src="{{host}}/static/js/hammer.jquery.min.js"></script>
+</html>

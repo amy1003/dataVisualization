@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+
+{% block myCss %}
+    <style>
+        .aligncenter {
+            clear: both;
+            display: block;
+            margin:auto;
+        }
+    </style>
+    <link rel="stylesheet" media="screen" href="{{host}}/static/css/bootstrap-select.min.css">
+{% endblock %}
+
+{% block mainContent %}
+    <div class="col-lg-12">
+
+        <div class="col-lg-12">
+            <div class="panel">
+                <button type="button" class="btn btn-link">工具栏&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-link" id="search">搜索&nbsp;&nbsp;<i class="fa fa-search"></i></button>
+                    <input type="text">
+                    <button type="button" class="btn btn-link" id="openUpload">数据集&nbsp;&nbsp;<i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-link" id="refresh">显示所有数据集&nbsp;&nbsp;<i class="fa fa-refresh"></i></button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle"  data-toggle="dropdown" id="sort">排序&nbsp;&nbsp;<i class="fa fa-sort-amount-asc"></i></button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">按名称</a></li>
+                            <li><a href="#">按上传时间</a></li>
+                            <li><a href="#">按类型</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle"  data-toggle="dropdown" id="sort">筛选&nbsp;&nbsp;<i class="fa fa-filter"></i></button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">所有excel</a></li>
+                            <li><a href="#">所有txt</a></li>
+                            <li><a href="#">所有csv</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dataSetHolder"></div>
+
+    </div>
+
+    </div>
+{% endblock %}
+
+{% block FunctionalModal %}
+    <div class="modal fade" id="uploadPanel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">数据集上传</h4>
+                </div>
+                <div class="modal-body no-padding">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">
+                                请选择您要上传的数据集<div style="font-size: 12px">--含多表的excel将会被自动拆分--</div>
+                            </div>
+                            <input id="fileInput" type="file">
+                            <div class="sub-title">
+                                请为数据集命名
+                            </div>
+                            <div>长度在15个字符内</div>
+                            <input type="text" id="datasetName" style="width: 60%;" class="form-control">
+                            <div class="sub-title"></div>
+                            <button type="button" id="fileHandle" class="btn btn-info">点击上传</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="dataContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="dataname">该数据集的数据</h4>
+                </div>
+                <div class="modal-body no-padding">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-lg-12">
+                                <textarea id="contentHolder" style="width: 720px;height: 500px;" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block myJavascript %}
+    <script type="application/javascript" src="static/myJs/common.js"></script>
+    <script src="{{host}}/static/js/bootstrap-select.min.js"></script>
+    <script type="text/babel">
+
+    $('#openUpload').click(function(){
+        $('#uploadPanel').modal('toggle');
+    });
+
+        /*文件上传↓*/
+    $('#fileHandle').click(function(){
+
+       var dataSetName = $('#datasetName').val();
+
+       if(dataSetName==''){myAlert('请输入数据集名字');return;}
+       else if(dataSetName.length>10){myAlert('长度超过了15个字符!');return;}
+
+       var fileObj = document.getElementById("fileInput").files[0];
+        if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+            myAlert('请选择文件！');
+            return;
+        }
+        //先检查是否重名
+
+        checkNewName(dataSetName).then(function(result){
+
+            if(result!='true'){
+                myAlert('存在相同名字的数据集，请重命名');
+                return ;
+            }
+            //FormData形式提交
+            var splited = fileObj.name.split('.');
+            var suffix = splited[splited.length-1];
+            var url = api.uploadFile;
+            if(suffix=='xls'||suffix=='xlsx'){
+                url += '/xl'
+            }
+            else if(suffix == 'txt')url+='/txt';
+            else if(suffix == 'csv')url+='/csv';
+            else{
+                myAlert('不支持该文件格式');
+                return ;
+            }
+
+            var formFile = new FormData();
+            formFile.append('file',fileObj);
+            formFile.append('name',dataSetName);
+
+            var uploadXHR = new XMLHttpRequest();
+            uploadXHR.open('POST',url, true);
+            uploadXHR.onload=function () {
+                console.log(uploadXHR.responseText);
+                if(uploadXHR.responseText=='true'){
+                    myOkAlert('数据集文件 '+dataSetName+' 已上传完成!');
+                    getAllDataset();//refresh
+                }
+                else {
+                    myAlert('出现未知错误!!');
+                }
+            };
+            uploadXHR.send(formFile);
+        });
+    });
+    /*文件上传↑*/
+
+    /*React组件*/
+    var DScomponent = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                dataprefix:'static/img/',
+                datatype:'',
+                datachoice:{
+                    excel:'xlsx.png',
+                    txt:'txt.png',
+                    csv:"csv.png"
+                },
+                name:'',
+                size:'',
+                time:'',
+                style:{
+                    'fontSize':'16px'
+                },
+                id:'',
+                inputStyle:{
+                    width:'40%'
+                }
+            };
+        },
+
+        getInitialState:function(){
+            return {
+                name:this.props.name,
+                isWorking:false, //true 上传中 false 未在上传,
+                timer:"" //timer是用来停止setInterval的
+            };
+        },
+
+        truncateName:function(str){
+            if(str.length>15){
+                return str.substr(0,8)+".."
+            }
+            else return str;
+        },
+
+        showDetail:function(){
+            $('#'+this.props.id).modal('toggle');
+        },
+
+        deleteMe:function(){
+            deleteADataset(this.state.name);
+        },
+
+        getContent:function(){
+            var staticname = this.state.name;
+              getContent(this.state.name).then(function(result){
+                  $('#contentHolder').get(0).innerHTML = result;
+                  $('#dataContent').modal('toggle');
+              });
+        },
+
+        openUpdate:function(){
+            if(!this.state.isWorking){
+                $(this.refs.updatePanel).modal('toggle');
+            }
+            else{
+                $(this.refs.isUpdating).modal('toggle');
+            }
+        },
+
+        stopUpdate:function(){
+            clearInterval(this.state.timer);
+            this.state.isWorking = false;
+        },
+
+        update:function(){
+            alert('已经开始更新！');
+            $(this.refs.updatePanel).modal('hide');
+            var count = 0;
+            var length = this.refs.fileInput.files.length;
+            var reactPt = this;
+            var interval = Number(this.refs.interval.value)*1000;
+            alert($(reactPt.refs.selectMode).val());
+            this.state.isWorking = true;
+            this.state.timer = setInterval(function(){
+                if(count==length-1){
+                    reactPt.stopUpdate();
+                }
+
+                var fileObj = reactPt.refs.fileInput.files[count];
+                var formFile = new FormData();
+                formFile.append('file',fileObj);
+                formFile.append('name',reactPt.state.name);
+                formFile.append('mode',$(reactPt.refs.selectMode).val());
+
+                var splited = fileObj.name.split('.'); //文件类型
+                var suffix = splited[splited.length-1];
+                var url = "";
+                if(suffix=='xls'||suffix=='xlsx'){
+                    url = '/xl'
+                }
+                else if(suffix == 'txt')url='/txt';
+                else if(suffix == 'csv')url='/csv';
+
+                var uploadXHR = new XMLHttpRequest();
+                uploadXHR.open('POST','{{host}}/updateFile'+url, true);
+                uploadXHR.onload=function () {
+                    console.log(uploadXHR.responseText);
+                };
+                uploadXHR.send(formFile);
+                count++;
+            },interval);
+        },
+
+        componentDidMount:function(){
+            $(this.refs.selectMode).selectpicker('refresh');
+        },
+
+        render:function (){
+            return <div className="col-lg-3">
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">
+                            <a href="#" data-toggle="tooltip" title={this.state.name} style={this.props.style}>{this.truncateName(this.state.name)}</a>
+                        </div>
+                        <div>
+                            <div className="btn-group pull-right" role="group" aria-label="...">
+                                <button type="button" className="btn btn-link" onClick={this.openUpdate}><i className="fa fa-upload"></i></button>
+                                <button type="button" className="btn btn-link" onClick={this.showDetail}><i className="fa fa-search-plus"></i></button>
+                                <button type="button" className="btn btn-link" onClick={this.deleteMe}><i className="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        <img src={this.props.dataprefix+this.props.datachoice[this.props.datatype]} width="100" height="100" className="aligncenter"></img>
+                    </div>
+                </div>
+                <div className="modal fade" id={this.props.id} tabindex="-1" role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">详细信息</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <div className="sub-title">
+                                            数据集名字:{this.state.name}
+                                        </div>
+                                        <div className="sub-title">
+                                            数据类型:{this.props.datatype}
+                                        </div>
+                                        <div className="sub-title">
+                                            创建时间:{this.props.time}
+                                        </div>
+                                        <div className="sub-tittle">
+                                            查看文档内容:
+                                            <button type="button" className="btn btn-link" onClick={this.getContent}><i className="fa fa-search-plus"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade" ref='updatePanel' tabindex="-1" role="dialog">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">更新数据</h4>
+                            </div>
+                            <div className="modal-body no-padding">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <div className="sub-title">选择更新模式</div>
+                                            <select class="selectpicker" ref="selectMode">
+                                                <option value="replace">替换</option>
+                                                <option value="update">更新</option>
+                                            </select>
+                                        <div className="sub-title">选择更新的文件</div>
+                                            <input ref="fileInput" type="file" multiple></input>
+                                        <div className="sub-title">设定更新间隔</div>
+                                            <input ref="interval"  type="text" className="form-control" style={this.props.inputStyle}></input>
+                                        <div className="sub-title"></div>
+                                            <button className="btn btn-info" onClick={this.update}>提交</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade" ref='isUpdating' tabindex="-1" role="dialog">
+                    <div className="modal-dialog modal-sm">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title">文件正在上传中</h4>
+                            </div>
+                            <div className="modal-footer">
+                                <button className="btn btn-warning" onClick={this.stopUpdate}>停止上传</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+    });
+    /*React组件*/
+
+    /*数据及获取*/
+    function getAllDataset(){
+        simpleGet(api.getAllDataset).then(function(result) {
+            var datasets = JSON.parse(result);
+            console.log(datasets);
+            if (datasets.hasOwnProperty('err')){
+                alert('error!!');
+                return;
+            }
+            var reactComp = [];
+            var tmpContainer = [];//考虑到布局，每四个加一行row
+            var i = 0;
+            for(name in datasets){
+                var tmp = datasets[name];
+                tmpContainer.push(
+                    <DScomponent id={i} name={name} size={tmp['size']} datatype={tmp['type']} time={tmp['time']}/>
+                );
+                i = i+1;
+                if(tmpContainer.length==4){
+                    reactComp.push(<div className="row">{tmpContainer}</div>)
+                    tmpContainer = [];//清空数组
+                }
+            }
+            if(tmpContainer.length!=0){ //剩下未满一行的
+                reactComp.push(<div className="row">{tmpContainer}</div>);
+            }
+            $('#dataSetHolder').get(0).innerHTML = "";
+            ReactDOM.render(<div>{reactComp}</div>,$('#dataSetHolder').get(0));
+        });
+    }
+
+    function getContent(name) {
+        return simplePost(api.getDatasetContent, 'name=' + name);
+    }
+    /*数据及获取*/
+
+    /*删除某个数据集*/
+    function deleteADataset(name){
+        if(confirm('确定要删除'+name+'吗?')){
+            simplePost(api.deleteDataset,'name='+name).then(function(result){
+               if(result=='true'){
+                   myOkAlert('删除成功！');
+                   getAllDataset();
+               }
+               else{
+                   myAlert(result);
+               }
+            });
+        }
+        else return;
+    }
+
+    /*刷新*/
+    $('#refresh').click(function(){
+       getAllDataset();
+    });
+    /*刷新*/
+
+    //界面渲染 获取所有数据集
+    document.getElementById('list2').setAttribute('class','active');
+    getAllDataset();
+
+    </script>
+{% endblock %}

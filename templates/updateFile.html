@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    此处测试数据的更新
+    <input id="fileInput" type="file" multiple>
+    <button id="send">发送</button>
+</body>
+<script src="static/myJs/common.js"></script>
+<script>
+
+    document.getElementById('send').onclick=function(){
+        var dataSetName = 'newDataSet';
+
+        var fileObj = document.getElementById("fileInput").files[0];
+        alert(fileObj.name);
+        var formFile = new FormData();
+        formFile.append('file',fileObj);
+        formFile.append('name',dataSetName);
+        var uploadXHR = new XMLHttpRequest();
+        uploadXHR.open('POST','http://192.168.43.213/uploadFile2HDF/xl', true);
+        uploadXHR.onload=function () {
+            console.log(uploadXHR.responseText);
+        };
+        uploadXHR.upload.addEventListener("progress", function(evt){
+            console.log( Math.round(evt.loaded / evt.total * 100));
+        }, false);
+        uploadXHR.send(formFile);
+    }
+</script>
+</html>

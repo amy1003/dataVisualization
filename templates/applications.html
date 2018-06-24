@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block myCss %}
+    <style>
+        .aligncenter {
+            clear: both;
+            display: block;
+            margin:auto;
+        }
+    </style>
+{% endblock %}
+
+{% block mainContent %}
+    <div class="col-lg-12">
+
+        <div class="col-lg-12">
+            <div class="panel">
+                <button type="button" class="btn btn-link">工具栏&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-link" id="newApp">新建应用&nbsp;&nbsp;<i class="fa fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="appHolder"></div>
+
+    </div>
+{% endblock %}
+
+{% block FunctionalModal %}
+    <div class="modal fade" id="createPanel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="border-color: #000;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">数据集上传</h4>
+                </div>
+                <div class="modal-body no-padding">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">
+                                请为应用命名
+                            </div>
+                            <div>长度在15个字符内</div>
+                            <input type="text" id="appName" style="width: 60%;" class="form-control">
+                            <div class="sub-title"></div>
+                            <button type="button" id="handleCreate" class="btn btn-info">创建应用</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block myJavascript %}
+<script type="application/javascript" src="static/myJs/common.js"></script>
+<script type="text/babel">
+    document.getElementById('list3').setAttribute('class','active');//界面选择\
+
+    //绑定按键
+    $('#newApp').click(function(){
+         $('#createPanel').modal('toggle');
+    });
+
+    $('#handleCreate').click(function(){
+        let newname = $('#appName').val();
+        createAapp(newname);
+    });
+
+    //该页面的应用代码
+    var AppBlock = React.createClass({
+        getDefaultProps:function(){
+            return {
+                name:'',
+                style:{
+                    'fontSize':'16px'
+                },
+            };
+        },
+        getInitialState:function(){
+            return {
+                name:this.props.name
+            };
+        },
+
+        truncateName:function(str){
+            if(str.length>15){
+                return str.substr(0,8)+".."
+            }
+            else return str;
+        },
+        enter:function(){
+            window.location.href = 'editApp/'+this.props.name;
+        },
+        delete:function(){
+            if(confirm('确定要删除吗?')){
+                deleteAapp(this.state.name);
+                initialize();
+            }
+        },
+        render:function(){
+            return <div className="col-lg-3">
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">
+                            <a href="#" data-toggle="tooltip" title={this.state.name} style={this.props.style}>{this.truncateName(this.state.name)}</a>
+                        </div>
+                        <div>
+                            <div className="btn-group pull-right" role="group" aria-label="...">
+                                <button type="button" className="btn btn-link" onClick={this.enter}><i className="fa fa-search-plus"></i></button>
+                                <button type="button" className="btn btn-link" onClick={this.delete}><i className="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        <img src={'static/img/applications.png'} width="100" height="100" className="aligncenter"></img>
+                    </div>
+                </div>
+            </div>;
+        }
+    });
+
+    function deleteAapp(appname){ //删除app
+        simplePost(api.deleteApp,{appname:appname}).then(function(result){
+            if(result=='false'){
+                myAlert('删除失败');
+            }
+            else if(result == 'true')myOkAlert('已经成功删除了应用');
+            initialize();
+        });
+    }
+
+    function createAapp(appname){ //创建app
+        simplePost(api.createApp,{appname:appname}).then(function(result){
+            if(result=='false'){
+                myAlert('创建失败，请检查名字是否有重复');
+            }
+            else if(result == 'true')myOkAlert('创建完毕');
+            initialize();
+        });
+    }
+
+    function initialize(){
+        simpleGet(api.getAllApplication).then(function(result){
+            $('#appHolder').get(0).innerHTML = "";
+            var r = JSON.parse(result);
+            var nameset = r['nameset'];
+            let reactComp = [];
+            for(let i =0;i<nameset.length;i++){
+                reactComp.push(<AppBlock name={nameset[i]} key={nameset[i]+i}/>);
+            }
+            ReactDOM.render(<div>{reactComp}</div>,$('#appHolder').get(0));
+        });
+    }
+
+    initialize();
+
+</script>
+{% endblock %}

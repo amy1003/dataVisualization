@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title id="appTitle">{appTitle}</title>
+    <!-- CSS Libs -->
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="http://yanshi.sucaihuo.com/jquery/31/3182/demo/css/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/bootstrap-switch.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/checkbox3.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/lib/css/dataTables.bootstrap.css">
+
+    <!-- CSS App -->
+    <link rel="stylesheet" type="text/css" href="{{host}}static/css/mainstyle.css">
+    <link rel="stylesheet" type="text/css" href="{{host}}static/css/themes/flat-blue.css">
+    <style>
+        .modal-dialog{
+                z-index: auto;
+            }
+
+            .modal.left .modal-dialog {
+                position: fixed;
+                margin: auto;
+                width: 20%;
+                height: 100%;
+                -webkit-transform: translate3d(0%, 0, 0);
+                    -ms-transform: translate3d(0%, 0, 0);
+                     -o-transform: translate3d(0%, 0, 0);
+                        transform: translate3d(0%, 0, 0);
+                z-index: auto;
+            }
+
+            .modal.right .modal-dialog {
+                position: fixed;
+                margin: auto;
+                width: 21%;
+                height: 100%;
+                -webkit-transform: translate3d(0%, 0, 0);
+                    -ms-transform: translate3d(0%, 0, 0);
+                     -o-transform: translate3d(0%, 0, 0);
+                        transform: translate3d(0%, 0, 0);
+                z-index: auto;
+            }
+
+            .modal.left .modal-content,
+            .modal.right .modal-content {
+                height: 100%;
+                overflow-y: auto;
+            }
+
+            .modal.left .modal-body,
+            .modal.right .modal-body {
+                padding: 15px 15px 80px;
+            }
+
+            /*Middle*/
+
+
+            /*Left*/
+            .modal.left.fade .modal-dialog{
+                left: -320px;
+                -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+                   -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                     -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                        transition: opacity 0.3s linear, left 0.3s ease-out;
+            }
+
+            .modal.left.fade.in .modal-dialog{
+                left: 0;
+            }
+
+            /*Right*/
+            .modal.right.fade .modal-dialog {
+                right: -320px;
+                -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+                   -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+                     -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+                        transition: opacity 0.3s linear, right 0.3s ease-out;
+            }
+
+            .modal.right.fade.in .modal-dialog {
+                right: 0;
+            }
+    </style>
+</head>
+<body class="flat-blue">
+    <div id="bg" >
+        <div id="menu">
+            <div id="demo_box">
+                <div class="pop_ctrl"><i class="fa fa-bars fa-4x"></i></div>
+                <ul id="demo_ul">
+                    <li class="demo_li"><a href="/home"><div><i class="fa fa-home fa-4x"></i></div><div>返回主页</div></a></li>
+                    <li class="demo_li" id="manageChart"><div><i class="fa fa-long-arrow-down fa-4x"></i></div><div>导入新表</div></li>
+                    <li class="demo_li" id="bgSetting"><div><i class="fa fa-picture-o fa-4x"></i></div><div>背景样式设置</div></li>
+                    <li class="demo_li" id="chartSetting"><div><i class="fa fa-pie-chart fa-3x"></i></div><div>图表设置</div></li>
+                    <li class="demo_li" id="runApp"><div><i class="fa fa-forward fa-3x"></i></div><div>运行程序</div></li>
+                    <li class="demo_li" id="stopApp"><div><i class="fa fa-pause fa-3x"></i></div><div>停止应用</div></li>
+                    <li class="demo_li" id="appRefresh"><div><i class="fa fa-refresh fa-3x"></i></div><div>刷新页面</div></li>
+                    <li class="demo_li" id="appSave"><div><i class="fa fa-floppy-o fa-3x"></i></div><div>保存应用</div></li>
+        {#                <li class="demo_li"><div><i class="fa fa-power-off fa-3x"></i></div><div>Exit</div></li>#}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="modalHolder">
+        <div class="modal fade" id=bgPanel role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">背景设置</h4>
+                    </div>
+                    <div class="modal-body" style="padding: 10px;">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="sub-title">画布面积-高度</div>
+                                <input class="form-control" type="text" id="bgheight">
+                                <div class="sub-title">画布面积-宽度</div>
+                                <input class="form-control" type="text" id="bgwidth">
+                                <div class="sub-title">背景颜色</div>
+                                <input type="color" id="bgColor">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type='button' class="btn btn-primary" id="bgApply">应用</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade left" id=chooseChart role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">图表设置</h4>
+                    </div>
+                    <div class="modal-body" style="padding: 10px;" id="chartsHolder">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade left" id=inputPanel role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">导入新图表</h4><h3 id="chartName"></h3>
+                </div>
+                <div class="modal-body" style="padding: 10px;">
+                    <div class="card" id="inputCharts">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div id="chartName"></div>
+
+</body>
+<script src="//code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script type="text/javascript" src="{{host}}static/js/echarts.js"></script>
+<script type="text/javascript" src="{{host}}static/lib/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{host}}static/js/jquery-popmenu.js"></script>
+<script src="{{host}}static/myJs/singleChartManager.js"></script>
+<script src="{{host}}static/myJs/common.js"></script>
+<script src="{{host}}static/js/react.js"></script>
+<script src="{{host}}static/js/react-dom.js"></script>
+<script src="{{host}}static/js/browser.min.js"></script>
+<script src="{{host}}static/js/china.js"></script>
+<script src="{{host}}static/js/world.js"></script>
+<script type="text/babel">
+
+    var tmpBg = {}//测试用
+
+    var Card = React.createClass({
+
+        getDefaultProps:function(){
+            return {
+                obj:{}
+            }
+        },
+
+        delete:function(){
+            if(confirm('真的需要删除吗?')){
+                deleteChart(this.props.name);
+            }
+        },
+
+        set:function(){
+            var props = this.props.obj.getProps();
+            props['height'] = this.refs.ctheight.value;
+            props['width'] = this.refs.ctwidth.value;
+            props['grid'] = this.refs.grid.value;
+            props['interval'] = this.refs.interval.value;
+            this.props.obj.setProps(props);
+        },
+
+        render:function(){
+            return <div className="card">
+                <div className="card-header">
+                    <div className="card-title">
+                        <h4><i className="fa fa-pie-chart fa-2x"></i>&nbsp;&nbsp;&nbsp;{this.props.name}</h4>
+                    </div>
+                </div>
+                <div classNameName="card-body">
+                    <div className="sub-title">图表高</div>
+                    <input className="form-control" type="text" defaultValue={this.props.obj.props.height} ref="ctheight"/>
+                    <div className="sub-title">图表宽</div>
+                    <input className="form-control" type="text" defaultValue={this.props.obj.props.width} ref="ctwidth"/>
+                    <div className="sub-title">拖动网格大小</div>
+                    <input className="form-control" type="text" defaultValue={this.props.obj.props.grid} ref="grid"/>
+                    <div className="sub-title">数据更新间隔(单位:秒)</div>
+                    <input className="form-control" type="text"defaultValue={this.props.obj.props.interval} ref="interval"/>
+                    <button typeName="button" className="btn btn-info" onClick={this.set}>应用</button>
+                    <button typeName="button" className="btn btn-warning" onClick={this.delete}>删除该表</button>
+                </div>
+            </div>
+        }
+    });
+
+    var ChooseCard = React.createClass({
+
+        input:function(){
+            inputChart(this.props.name);
+        },
+        render:function(){
+            return <div className='card'>
+                <div className="card-header">
+                    <div className="card-title">
+                        <h4>{this.props.name}</h4>
+                    </div>
+                </div>
+                <div className="card-body">
+                    <button typeName="button" className="btn btn-warning" ref="input" onClick={this.input}>导入该表</button>
+                </div>
+            </div>;
+        }
+    });
+
+
+    var playSeries = []; //setInterval 序列,用来控制运行
+
+    var chartsList = {};
+
+    alert($('#appTitle').val());
+
+    var appname = '应用1';
+
+    var defaultBg = {
+        width:1536,
+        height:742,
+        color:'transparent'
+    };
+
+    var createChartOption = function(){
+
+        var option = {
+            width:500,
+            height:500,
+            top:0,
+            left:0,
+            interval:3,
+            grid:1,
+            position:'absolute'
+        };
+        return option;
+    };
+
+    var setBg = function(height,width,color){
+        $('#bg').css('height',height);
+        $('#bg').css('width',width);
+        $('#bg').css('background-color',color);
+    };
+
+    function initialize(){
+        //获取应用的数据----------------------------------------------
+        simplePost(api.getApplication,{appname:appname}).then(function(result){
+            var r =JSON.parse(result);
+            console.log(r);
+            var bg = JSON.parse(r['bg']);
+            if(bg=="")bg = defaultBg;
+
+            //设置背景
+
+            tmpBg['height'] = bg['height'];
+            tmpBg['width'] = bg['width'];
+            tmpBg['color'] = bg['color'];
+            $('#bgheight').val(bg['height']);
+            $('#bgwidth').val(bg['width']);
+            $('#bgColor').val(bg['color']);
+            setBg(bg['height'].replace('px'),bg['width'].replace('px'),bg['color']);
+
+            //初始化图像
+            var charts = r['charts'];
+            for(name in charts){
+                var chart = JSON.parse(charts[name]);
+                if(!chart.hasOwnProperty('app')){
+                    chart['app'] = createChartOption();
+                }
+                chartsList[name] = new Chart(name,chart['app'],chart);
+                chartsList[name].render();
+            }
+
+        });
+    }
+
+    initialize();
+
+    //---------------------------------------------------------
+
+    $('#chartSetting').click(function(){
+        var comp = [];
+        for(name in chartsList){
+            comp.push(<Card obj={chartsList[name]} name={name}/>);
+        }
+        ReactDOM.render(<div>{comp}</div>,$('#chartsHolder').get(0));
+        $('#chooseChart').modal('toggle');
+    });
+
+    $('#appSave').click(function(){
+        saveApp();
+    });
+    function saveApp(){ //保存app
+        for(name in chartsList){
+            var manager = chartsList[name].getManager();
+            manager.saveChart(name);
+        }
+        var bg = {};
+        bg['height'] = $('#bg').css('height');
+        bg['width'] = $('#bg').css('width');
+        bg['color'] = $('#bg').css('background-color');
+        var bgstr = JSON.stringify(bg);
+        simplePost(api.saveApp,{appname:appname,bg:bgstr}).then(function(result){
+            if(result=='true'){
+                alert('保存成功!');
+            }
+            else{
+                alert('保存失败');
+            }
+        })
+    }
+
+    $('#runApp').click(function(){
+        alert('应用已经启动!');
+        for(name in chartsList){
+            var chartname = name;
+            var manager = chartsList[name].getManager();
+            var interval = chartsList[name].props.interval;
+            var timer = runApplication(chartname,manager,interval);
+            playSeries.push(timer);
+        }
+    });
+
+    function runApplication(chartname,chartManager,interval){
+        var count = 50;
+        var doptstr = JSON.stringify(chartManager.getDataOptions());
+        console.log(chartname);
+        var timer = setInterval(function(){
+            simplePost(api.runDataOption,{'chartname':chartname,'dataoption':doptstr}).then(function(result){
+                console.log(result);
+                var obj = JSON.parse(result);
+                for(name in obj){
+                    var vobj = chartManager.Visualizations.get(name);
+                    vobj.setData(obj[name]);
+                }
+            });
+        },Number(interval)*1000);
+        return timer;
+    }
+
+    $('#stopApp').click(function(){
+        stopApp();
+    });
+    function stopApp(){ //停止运行
+        for(var i=0;i<playSeries.length;i++){
+            clearInterval(playSeries[i]);
+        }
+        alert('应用已经暂停');
+    }
+
+    $('#manageChart').click(function(){
+        simpleGet(api.getCharts).then(function(result){
+            var obj = JSON.parse(result);
+            var comps = [];
+            for(name in obj){
+                if(chartsList.hasOwnProperty(name))continue;
+                else{
+                    comps.push(<ChooseCard name={name}/>);
+                }
+            }
+            ReactDOM.render(<div>{comps}</div>,$('#inputCharts').get(0));
+            $('#inputPanel').modal('toggle');
+        });
+    });
+    function inputChart(chartName){
+        simplePost(api.addChartToApp,{appname:appname,chartname:chartName}).then(function (result) {
+             if(result=='ok'){
+                 alert('添加成功!');
+                 simplePost(api.getChartOption,{chartName:chartName}).then(function(r){
+                     var chart = JSON.parse(r);
+                     if(!chart.hasOwnProperty('app')){
+                        chart['app'] = createChartOption();
+                     }
+                     chartsList[chartName] = new Chart(chartName,chart['app'],chart);
+                     chartsList[chartName].render();
+                 })
+             }
+             else alert('添加失败');
+        });
+    }
+
+    function deleteChart(chartName){
+        simplePost(api.reduceChartFromApp,{appname:appname,chartname:chartName}).then(function (result) {
+             if(result=='ok'){
+                 var obj = chartsList[chartName];
+                 obj.deRender();
+                 delete chartsList[chartName];
+                 alert('删除成功!');
+             }
+             else alert('删除失败');
+        });
+    };
+
+    //初始化网格菜单---------------------------------------------------
+
+
+
+    //背景设置菜单-------长 宽 颜色---------------------------------------------------
+    $('#bgSetting').click(function(){
+        $('#bgPanel').modal('toggle');
+    });
+
+    $('#bgApply').click(function(){
+        var height,width,color;
+        height = $('#bgheight').val();
+        width = $('#bgwidth').val();
+        color = $('#bgColor').val();
+        setBg(height,width,color);
+    });
+
+     //chart 对象
+     var Chart = function(id,props,Mainchart){
+         //id
+         this.id = id;
+         //拖动网格
+         this.props = props; //grid top left width height interval
+         //主体
+         this.Mainchart = Mainchart;
+
+         this.chartManager = {};
+
+         //画图
+         this.render = function(){
+
+             var div = "<div id=" + this.id + ">"+ "</div>";
+             $('#bg').append(div);
+             $('#'+this.id).css(this.props);
+
+             //拖动绑定事件
+             var obj =this;
+             $('#'+this.id).draggable({
+                 grid:[this.props.grid,this.props.grid],
+                 containment:'parent',
+                 stop:function(){
+                     obj.props.top = $('#'+this.id).css('top');
+                     obj.props.left = $('#'+this.id).css('left');
+                     console.log(obj.props);
+                 }
+             });
+
+             var chart = echarts.init($('#'+this.id).get(0));
+             this.chart = chart;
+             this.chartManager = ChartManager(chart,this.Mainchart);
+             this.chartManager.renew();
+
+         };
+         //去除图像
+         this.deRender = function(){
+            $('#'+this.id).remove();
+         };
+
+         this.getProps = function(){
+            return this.props;
+         };
+         this.setProps = function(newVal){
+            this.props = newVal;
+            var obj =this;
+            $('#'+this.id).draggable({
+                 grid:[this.props.grid,this.props.grid],
+                 containment:'parent',
+                 stop:function(){
+                     obj.props.top = $('#'+this.id).css('top');
+                     obj.props.left = $('#'+this.id).css('left');
+                     console.log(obj.props);
+                 }
+             });
+            $('#'+this.id).css(this.props);
+            this.chart.resize();
+         };
+         this.getManager = function(){
+             return this.chartManager;
+         };
+     };
+
+
+{#     var mychart = echarts.init(document.getElementById('canvas'));#}
+{#     mychart.setOption(option4);#}
+{#     $( "#canvas" ).draggable({  grid: [ 10, 10 ],containment: "parent"});#}
+
+
+{#    setTimeout(function(){#}
+{#        $('#canvas').css('height','450px');#}
+{#        $('#canvas').css('width','450px');#}
+{#        mychart.resize();#}
+{#    },3000)#}
+{##}
+{#    setTimeout(function(){#}
+{#        $( "#canvas" ).draggable({  grid: [ 100, 100 ],containment: "parent" });#}
+{#        alert($('#canvas').css('left'));#}
+{#        alert($('#canvas').css('top'));#}
+{#        $('#canvas').css('left','600px');#}
+{#        $('#canvas').css('top','600px');#}
+{#    },6000);#}
+
+    setTimeout(function(){
+        setBg(tmpBg['height'],tmpBg['width'],tmpBg['color']);
+    },1000)
+    //初始化菜单
+    $('#demo_box').popmenu();
+    $('#demo_box_2').popmenu({
+        'background':'#e67e22',
+        'z-index':1000,
+        'focusColor':'#c0392b',
+        'borderRadius':'0',
+        'top':'300',
+        'left':'1000'
+    });
+    $('#demo_ul').css('z-index',1000); //覆盖全图
+
+    $( "#demo_box" ).draggable({  grid: [ 10, 10 ]});
+
+</script>
+</html>
+

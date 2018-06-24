@@ -1,0 +1,682 @@
+{% extends 'base.html' %}
+
+{% block myCss %}
+    <style type="text/css">
+        .mybtn{position:fixed; right:10px; bottom:20px; display:block; width:50px; height:50px;border-radius:50px; padding:0px; text-align:center; line-height:50px;}
+
+
+        .modal-dialog{
+            z-index: 1000;
+            height: 100%;
+        }
+
+        .modal.left_more .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 50%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: 1000;
+        }
+
+        .modal.right .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 50%;
+            height: 100%;
+            -webkit-transform: translate3d(0%, 0, 0);
+                -ms-transform: translate3d(0%, 0, 0);
+                 -o-transform: translate3d(0%, 0, 0);
+                    transform: translate3d(0%, 0, 0);
+            z-index: 1000;
+        }
+
+        .modal.left_more .modal-content,
+        .modal.right .modal-content {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .modal.left_more .modal-body,
+        .modal.right .modal-body {
+            padding: 15px 15px 80px;
+        }
+
+        /*Middle*/
+
+
+        /*Left*/
+        .modal.left_more.fade .modal-dialog{
+            left: -320px;
+            -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                    transition: opacity 0.3s linear, left 0.3s ease-out;
+        }
+
+        .modal.left_more.fade.in .modal-dialog{
+            left: 0;
+        }
+
+        /*Right*/
+        .modal.right.fade .modal-dialog {
+            right: -320px;
+            -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+               -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+                 -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+                    transition: opacity 0.3s linear, right 0.3s ease-out;
+        }
+
+        .modal.right.fade.in .modal-dialog {
+            right: 0;
+        }
+
+        .modal-backdrop {
+            opacity: 0 !important;
+            filter: alpha(opacity=0) !important;
+        }
+
+        .htContextMenu.handsontable{
+            z-index:16777271;
+        }
+
+    </style>
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/bootstrap-slider/9.4.1/css/bootstrap-slider.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="http://demo.htmleaf.com/1609/201609271528/css/build.css">
+    <link rel="stylesheet" media="screen" href="static/css/handsontable.full.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+
+{% endblock %}
+
+{% block mainContent %}
+    <input type="text" id="search"/><div id="resultNum"></div>
+
+
+    <input type="button" id="callPanel" value="callPanel">
+
+     <div class="modal fade right" id=dataPanel role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">数据操作<h6>(运算时请勿选择空白格以防止错误发生)</h6></h4>
+                </div>
+                <div class="modal-body" id="createContent" style="padding: 10px;">
+                    <h4 class="sub-title">原数据</h4>
+                    <div id="example" style="overflow: hidden"></div>
+                    <h4 class="sub-title">运算结果</h4>
+                    <div id="example2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade right" id='groupbyPanel' role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">分组计算</h4>
+                </div>
+                <div class="modal-body"style="padding: 10px;">
+                    <div class="card" style="height: 700px;">
+                        <div class="card-body">
+                            <div class="sub-title">维度选择</div>
+                            <div>
+                                <select class="selectpicker" multiple data-live-search="true" style="width: 250px" id="colSelect">
+
+                                </select>
+                            </div>
+                            <div class="sub-title">计算方式</div>
+                            <div>
+                                <select class="selectpicker" data-live-search="true" style="width: 250px" id="groupAction">
+                                        <option value="row:sum">按行求和</option>
+                                        <option value="row:mean">按行求平均</option>
+                                        <option value="row:median">按行求中位数</option>
+                                        <option value="row:min">按行求最小</option>
+                                        <option value="row:max">按行求最大</option>
+                                        <option value="row:count">按行计数</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="handleGroupby">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade right" id='queryPanel' role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">分组计算</h4>
+                </div>
+                <div class="modal-body" style="padding: 10px;">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="sub-title">查询表达式</div>
+                            <input class="form-control" style="width:500px" id="queryCondition"/>
+                            <div class="sub-title">计算方式</div>
+                            <div>
+                                <select class="selectpicker" data-live-search="true" style="width: 250px" id="queryAction">
+                                    <optgroup label="按行">
+                                        <option value="row:sum">按行求和</option>
+                                        <option value="row:mean">按行求平均</option>
+                                        <option value="row:median">按行求中位数</option>
+                                        <option value="row:min">按行求最小</option>
+                                        <option value="row:max">按行求最大</option>
+                                        <option value="row:count">按行计数</option>
+                                   </optgroup>
+                                   <optgroup label="按列">
+                                        <option value="col:sum">按列求和</option>
+                                        <option value="col:mean">按列求平均</option>
+                                        <option value="col:median">按列求中位数</option>
+                                        <option value="col:min">按列求最小</option>
+                                        <option value="col:max">按列求最大</option>
+                                        <option value="col:count">按列计数</option>
+                                   </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="handleQuery">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block myJavascript %}
+<script src="static/js/classie.js"></script>
+<script src="static/myJs/common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/2.0.0/handsontable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+<script src="static/js/sylvester.js"></script>
+<script>
+//全局变量
+
+
+var hot,hot2; //原表 结果
+
+var firstClick = true;
+
+var DataOptions = [];
+
+var chartname = 'hjsjda';
+
+var dataColHeader = [];
+
+var resultData = [];
+
+var currentDataFrom = "main";
+
+//---------用于表格组件----------------
+var currentSelected = [];
+//-------------------------------------
+
+$('#callPanel').click(function(){
+    $('#dataPanel').modal('toggle');
+    if(firstClick){
+        setTimeout(function () {
+            initDataTable();
+        },1000);
+        firstClick = false;
+    }
+});
+
+//-------------------------------groupby--------------------------------------
+$('#groupbyPanel').on('shown.bs.modal', function (e) {
+    for (var i = 0; i < dataColHeader.length; i++) {
+        $('#colSelect').append("<option value=" + "aba" + ">" + "sadfasdf" + "</option>");
+    }
+    $('#colSelect').selectpicker('refresh');
+});
+
+$('#groupbyPanel').on('hide.bs.modal', function (e) {
+    $('#colSelect').get(0).innerHTML = "";
+});
+
+$('#handleGroupby').click(function(){
+    var groups = $('#colSelect').val();
+    var action = $('#groupAction').val();
+    var para = action.split(':');
+    DataManager.groupby(currentSelected,groups,para[0],para[1],'main');
+    $('#groupbyPanel').modal('hide');
+});
+
+//-------------------------------query--------------------------------------
+
+$('#handleQuery').click(function(){
+    var condition = $('#queryCondition').val();
+    var action = $('#queryAction').val();
+    var para = action.split(':');
+    DataManager.query(condition,para[0],para[1],'main');
+    $('#queryPanel').modal('hide');
+});
+
+///--------------------------------
+var changeFormat = function(data,type){
+
+    var result = [];
+    if(type==='row'){
+        for(name in data){
+            if(data[name]!==null){
+                result.push(Object.keys(data[name]));
+            }
+            break;
+        }
+        for(name in data){
+            var row = [];
+            for(i in data[name]){
+                row.push(data[name][i]);
+            }
+            result.push(row);
+        }
+    };
+    if(type==='col'){
+        var col = [];
+        for(name in data){
+            for(i in data[name]){
+                col.push([data[name][i]]);
+            }
+        }
+        result = col;
+    }
+    return result;
+};
+
+function createTable(container,contentName,canCalculate,enableSearch,searchDom){
+
+    var createDataOption = function(type){  //计算选项创建
+        var title = type==='rowOptions'?'行':type==='colOptions'?'列':'';
+        var dataOption = [
+            {
+                name:title+'求和',
+                key:type+":sum"
+            },
+             {
+                name:title+'求均值',
+                 key:type+":mean"
+            },
+             {
+                name:title+'求中位数',
+                 key:type+":median"
+            },
+             {
+                name:title+'求最大',
+                 key:type+":max"
+            },
+             {
+                name:title+'求最小',
+                 key:type+":min"
+            },
+            {
+                name:title+'求众数',
+                key:type+":mode"
+            },
+        ];
+        if(type=='row'){
+            dataOption.push({
+                name:title+'计数',
+                key:type+":count"
+            });
+        }
+        return dataOption;
+    };
+
+    function searchResultCounter(instance, row, col, value, result) { //搜索方法
+        const DEFAULT_CALLBACK = function(instance, row, col, data, testResult) {
+            instance.getCellMeta(row, col).isSearchResult = testResult;
+        };
+
+        DEFAULT_CALLBACK.apply(this, arguments);
+
+        if (result) {
+            searchResultCount++;
+        }
+    }
+
+    if(enableSearch==true){
+        s = searchDom;
+
+        Handsontable.dom.addEvent(s, 'keyup', function(event) {
+
+            searchResultCount = 0;
+
+            var search = hot.getPlugin('search');
+            var queryResult = search.query(this.value);
+
+            document.getElementById('resultNum').innerHTML = searchResultCount;
+
+            console.log(queryResult);
+            if(queryResult.length>0){
+                hot.scrollViewportTo(queryResult[0]['row'],queryResult[0]['col'])
+            }
+            hot.render();
+        });
+    }
+
+    var calculationOption = {
+        'selectAll': {
+                name: '全选',
+            },
+        'row': {
+            name: '按行操作',
+            submenu: {
+                items: createDataOption('row')
+            }
+        },
+        'col': {
+            name: '按列操作',
+            submenu: {
+                items: createDataOption('col')
+            }
+        },
+        'query': {
+            name: '条件查询'
+        },
+        'groupBy': {
+            name: '分组运算',
+        },
+    };
+
+    var options ={
+        'selectAll': {
+            name: '全选',
+        },
+        'setData': {
+            name: '应用数据',
+            submenu: {
+                items: [
+                    {
+                        name: '按列获取',
+                        key: 'setData' + ":bycol"
+                    },
+                    {
+                        name: '按行获取',
+                        key: 'setData' + ":byrow"
+                    }
+                ]
+            }
+        },
+        'saveAndSet': {
+            name: '应用数据并保存配置项',
+            submenu: {
+                items: [
+                    {
+                        name: '按列获取',
+                        key: 'saveAndSet' + ":bycol"
+                    },
+                    {
+                        name: '按行获取',
+                        key: 'saveAndSet' + ":byrow"
+                    }
+                ]
+            }
+        }
+    };
+
+    if(canCalculate){
+        for(name in calculationOption){
+            options[name] = calculationOption[name];
+        }
+    }
+
+    //矩阵操作
+
+    function verticalCat(a,b){ //数值连接
+        var c = a.transpose();
+        var d = b.transpose();
+        var e = c.augment(d);
+        return e.transpose();
+    }
+
+    function divideByCol(selected){ //按同行分类
+        var result = [];
+        var count = 0;
+        while(selected.length>0) {
+            console.log('round'+count++);
+            var set = [];
+            var cur = selected[0];
+            set.push(cur);
+            selected.splice(0,1);
+            var index = [];
+            alert('start'+selected);
+            for(var i=0;i<selected.length;i++){
+                if(cur[0]==selected[i][0] && cur[2]==selected[i][2]){
+                    index.push(i);
+                }
+            }
+            for(var j=0;j<index.length;j++){
+                set.push(selected[index[j]]);
+            }
+            for(var j=0;j<index.length;j++){
+                delete selected[index[j]]
+            }
+            var newSelected = [];
+            for(var j=0;j<selected.length;j++){
+                if(selected[j]!=undefined)newSelected.push(selected[j])
+            }
+            selected = newSelected;
+            result.push(set);
+        }
+        return result;
+    }
+
+    function handleData(data,type){
+        try{
+            alert(type);
+            if(data.length==0)return;
+            console.log(data);
+            var matrix =[];
+            for(var i=0;i<data.length;i++){
+                var line = $M(data[i][0]);
+                for(var j=1;j<data[i].length;j++){
+                    line = line.augment($M(data[i][j]));
+                }
+                matrix.push(line);
+            }
+
+            var result = matrix[0];
+            for(var i=1;i<matrix.length;i++){
+                result = verticalCat(result,matrix[i]);
+            }
+            console.log(result);
+            if(type=='byrow'){
+                return result.elements;
+            }
+            else if(type =='bycol'){
+                alert('hi!');
+                console.log(result.transpose().elements);
+                return result.transpose().elements;
+            }
+
+        }catch (e){
+            console.log(e);
+        }
+        return [];
+    }
+
+    var hot = new Handsontable(container,
+        {
+        data: [[]],
+        colHeaders: true,
+        height: 600,
+        width: 740,
+        colWidths: "80px",
+
+        readOnly: true,
+        cells: function (row) { //锁定第一行
+            var cellProperties = {};
+            if (row === 0) {
+                cellProperties.readOnly = true;
+            }
+            return cellProperties;
+        },
+        contextMenu: {
+            callback: function (key, options) {
+
+                currentSelected = hot.getSelected();
+                if (key === 'selectAll') {
+                    hot.selectRows(1, hot.rowsNum - 1); //第一行不用于计算 是columnsHeader
+                }
+                else if (key === 'groupBy') {
+                    currentDataFrom = hot.content;
+                    $('#groupbyPanel').modal('toggle');
+                }
+                else if (key === 'query') {
+                    currentDataFrom = hot.content;
+                    $('#queryPanel').modal('toggle');
+                }
+                else if (key.indexOf('setData') == 0) {
+                    var para = key.split(':');
+                    var selected = hot.getSelected();
+                    var divided = divideByCol(selected);
+                    console.log(divided);
+                    var data = [];
+                    for(var i=0;i<divided.length;i++){
+                        var colData = [];
+                        for(var j=0;j<divided[i].length;j++){
+                            colData.push(hot.getSourceData(divided[i][j][0],divided[i][j][1],divided[i][j][2],divided[i][j][3]));
+                        }
+                        data.push(colData);
+                    }
+                    handleData(data,para[1]);
+                }
+                else if (key === 'saveAndSet') {
+
+                }
+                else {
+                    var para = key.split(':');
+                    var selected = hot.getSelected();
+                    for (var i = 0; i < selected.length; i++) {
+                        if (selected[i][0] == 0 || selected[i][2] == 0) {
+                            alert('列名称不可参与运算!');
+                            return;
+                        }
+                    }
+                    DataManager.Calculation(selected, para[0], para[1], 'main');
+                }
+            },
+            items: options
+        },
+        search: {
+            callback: searchResultCounter
+        }
+    });
+
+    hot.content = contentName;
+
+    return hot;
+};
+
+function initDataTable(){
+
+    var container = document.getElementById('example');
+
+    hot = createTable(container,'main',true,false);
+
+    hot2 = createTable($('#example2').get(0),'',false,false);
+
+    hot.rowsNum = 0,hot.colsNum = 0;
+
+    simplePost(api.getAllData,{cname:chartname}).then(function(result){
+        var result = JSON.parse(result);
+        var data = changeFormat(result,'row');
+        hot.updateSettings({
+            data:data
+        });
+        hot.rowsNum = data.length;
+        try{
+            hot.colsNum = data[0].length;
+            dataColHeader = data[0];
+            hot2.updateSettings({data:[dataColHeader]});
+            resultData.push(dataColHeader);
+        }
+        catch (e){
+            console.log(e)
+        }
+    });
+}
+
+
+//数据管理 负责前后端数据的交互
+
+var DataManager = {
+    count:0, //标识result
+    Calculation:function(selected,type,action,from){
+        var data = {};
+        data['calculation'] = {
+            from:from,
+            selected:selected,
+            type:type,
+            action:action,
+            to:'result'+this.count++
+        };
+        this.startProcess(data);
+    },
+    groupby:function(selected,groups,type,action,from,to){
+        var data = {};
+        data['groupby'] = {
+            group:groups,
+            type:type,
+            selected:selected,
+            action:action,
+            from:from,
+            to:'result'+this.count++
+        };
+        this.startProcess(data);
+    },
+    query:function(condition,type,action,from,to){
+        var data = {};
+        data['query'] ={
+            condition:condition,
+            type:type,
+            action:action,
+            from:from,
+            to:'result'+this.count++
+        };
+        this.startProcess(data);
+    },
+    startProcess:function(data){
+        simplePost(api.dataProcess,{cname:chartname,order:JSON.stringify(data)}).then(function(result){
+            try{
+                resultData = JSON.parse(result);
+                console.log(resultData);
+                var formatedData = [];
+                if(data[Object.keys(data)[0]]['type']==='col'&&data[Object.keys(data)[0]]['action']==='mode'){
+                    formatedData = changeFormat(resultData,'row'); //求列众数按这种效果显示好一些
+                }
+                else{
+                    formatedData = changeFormat(resultData,data[Object.keys(data)[0]]['type']);
+                }
+                resultData = formatedData;
+                hot2.updateSettings({data:resultData});
+                hot2.content = data[Object.keys(data)[0]]['to'];
+                hot2.data = resultData;
+                try{
+                    hot2.rowsNum = resultData.length;
+                }catch (e){
+                    console.log(e);
+                }
+            }catch (e){
+                console.log(e);
+                myAlert(result);
+            }
+        });
+    },
+
+};
+
+</script>
+{% endblock %}
+

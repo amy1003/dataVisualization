@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>数据可视化系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Fonts -->
+{#    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,400' rel='stylesheet' type='text/css'>#}
+{#    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>#}
+    <!-- CSS Libs -->
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/bootstrap-switch.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/checkbox3.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/lib/css/dataTables.bootstrap.css">
+
+    <!-- CSS App -->
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/css/mainstyle.css">
+    <link rel="stylesheet" type="text/css" href="{{ host }}/static/css/themes/flat-blue.css">
+
+    {% block myCss %}
+    <style type="text/css">
+            .mybtn{position:fixed; right:10px; bottom:20px; display:block; width:50px; height:50px;border-radius:50px; padding:0px; text-align:center; line-height:50px;}
+
+
+            .modal-dialog{
+                z-index: auto;
+            }
+
+            .modal.left .modal-dialog {
+                position: fixed;
+                margin: auto;
+                width: 20%;
+                height: 100%;
+                -webkit-transform: translate3d(0%, 0, 0);
+                    -ms-transform: translate3d(0%, 0, 0);
+                     -o-transform: translate3d(0%, 0, 0);
+                        transform: translate3d(0%, 0, 0);
+                z-index: auto;
+            }
+
+            .modal.right .modal-dialog {
+                position: fixed;
+                margin: auto;
+                width: 21%;
+                height: 100%;
+                -webkit-transform: translate3d(0%, 0, 0);
+                    -ms-transform: translate3d(0%, 0, 0);
+                     -o-transform: translate3d(0%, 0, 0);
+                        transform: translate3d(0%, 0, 0);
+                z-index: auto;
+            }
+
+            .modal.left .modal-content,
+            .modal.right .modal-content {
+                height: 100%;
+                overflow-y: auto;
+            }
+
+            .modal.left .modal-body,
+            .modal.right .modal-body {
+                padding: 15px 15px 80px;
+            }
+
+            /*Middle*/
+
+
+            /*Left*/
+            .modal.left.fade .modal-dialog{
+                left: -320px;
+                -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+                   -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+                     -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+                        transition: opacity 0.3s linear, left 0.3s ease-out;
+            }
+
+            .modal.left.fade.in .modal-dialog{
+                left: 0;
+            }
+
+            /*Right*/
+            .modal.right.fade .modal-dialog {
+                right: -320px;
+                -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+                   -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+                     -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+                        transition: opacity 0.3s linear, right 0.3s ease-out;
+            }
+
+            .modal.right.fade.in .modal-dialog {
+                right: 0;
+            }
+
+            /* ----- MODAL STYLE ----- */
+            .modal-content {
+                border-radius: 0;
+                border: none;
+            }
+
+            .modal-header {
+                border-bottom-color: #EEEEEE;
+                background-color: #FAFAFA;
+            }
+
+            .modal-backdrop {
+                opacity: 0.25 !important;
+                filter: alpha(opacity=0) !important;
+            }
+
+
+        </style>
+    {% endblock %}
+</head>
+
+<body class="flat-blue">
+    <div class="app-container">
+        <div class="row content-container">
+            <nav class="navbar navbar-default navbar-fixed-top navbar-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-expand-toggle">
+                            <i class="fa fa-bars icon"></i>
+                        </button>
+                        <ol class="breadcrumb navbar-breadcrumb">
+                            <li class="active">{{ pageName }}</li>
+                        </ol>
+                        <button type="button" class="navbar-right-expand-toggle pull-right visible-xs">
+                            <i class="fa fa-th icon"></i>
+                        </button>
+                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <button type="button" class="navbar-right-expand-toggle pull-right visible-xs">
+                            <i class="fa fa-times icon"></i>
+                        </button>
+                        <li class="dropdown profile">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ username }} <span class="caret"></span></a>
+                            <ul class="dropdown-menu animated fadeInDown">
+                                <li class="profile-img">
+                                    <img src="static/img/profile/picjumbo.com_HNCK4153_resize.jpg" class="profile-img">
+                                </li>
+                                <li>
+                                    <div class="profile-info">
+                                        <h4 class="username">{{ username }}</h4>
+                                        <div class="btn-group margin-bottom-2x" role="group">
+                                            <button type="button" class="btn btn-default"><i class="fa fa-user"></i> 个人设置</button>
+                                            <button type="button" class="btn btn-default"><i class="fa fa-sign-out"></i><a href="{{ host }}/logout">登出</a></button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="side-menu sidebar-inverse">
+                <nav class="navbar navbar-default" role="navigation">
+                    <div class="side-menu-container">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" href="#">
+                                <div class="icon fa fa-paper-plane"></div>
+                                <div class="title">可视化系统导航</div>
+                            </a>
+                            <button type="button" class="navbar-expand-toggle pull-right visible-xs">
+                                <i class="fa fa-times icon"></i>
+                            </button>
+                        </div>
+                        <ul class="nav navbar-nav">
+                            <li id="list1">
+                                <a href="/home">
+                                    <span class="icon fa fa-tachometer"></span><span class="title">我的数据画板</span>
+                                </a>
+                            </li>
+                            <li id="list2">
+                                <a href="/dataset"><span class="icon fa fa-file-text-o"></span><span class="title">数据集管理</span></a>
+                            </li>
+                            <li id="list3">
+                                <a href="/applications">
+                                    <span class="icon fa fa-desktop"></span><span class="title">应用组装</span>
+                                </a>
+                            </li>
+{#                            <li id="list4">#}
+{#                                <a href="/dataset"><span class="icon fa fa-search-plus"></span><span class="title">数据发现</span></a>#}
+{#                            </li>#}
+{#                            <li class="panel panel-default dropdown">#}
+{#                                <a data-toggle="collapse" href="#dropdown-table">#}
+{#                                    <span class="icon fa fa-table"></span><span class="title">Table</span>#}
+{#                                </a>#}
+{#                                <!-- Dropdown level 1 -->#}
+{#                                <div id="dropdown-table" class="panel-collapse collapse">#}
+{#                                    <div class="panel-body">#}
+{#                                        <ul class="nav navbar-nav">#}
+{#                                            <li><a>Table</a>#}
+{#                                            </li>#}
+{#                                            <li><a>Datatable</a>#}
+{#                                            </li>#}
+{#                                        </ul>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            #}
+{#                            <!-- Dropdown-->#}
+{#                            <li class="panel panel-default dropdown">#}
+{#                                <a data-toggle="collapse" href="#component-example">#}
+{#                                    <span class="icon fa fa-cubes"></span><span class="title">Components</span>#}
+{#                                </a>#}
+{#                                <!-- Dropdown level 1 -->#}
+{#                                <div id="component-example" class="panel-collapse collapse">#}
+{#                                    <div class="panel-body">#}
+{#                                        <ul class="nav navbar-nav">#}
+{#                                            <li><a href="components/pricing-table.html">Pricing Table</a>#}
+{#                                            </li>#}
+{#                                            <li><a href="components/chartjs.html">Chart.JS</a>#}
+{#                                            </li>#}
+{#                                        </ul>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <!-- Dropdown-->#}
+{#                            <li class="panel panel-default dropdown">#}
+{#                                <a data-toggle="collapse" href="#dropdown-example">#}
+{#                                    <span class="icon fa fa-slack"></span><span class="title">Page Example</span>#}
+{#                                </a>#}
+{#                                <!-- Dropdown level 1 -->#}
+{#                                <div id="dropdown-example" class="panel-collapse collapse">#}
+{#                                    <div class="panel-body">#}
+{#                                        <ul class="nav navbar-nav">#}
+{#                                            <li><a href="pages/login.html">Login</a>#}
+{#                                            </li>#}
+{#                                            <li><a href="pages/index.html">Landing Page</a>#}
+{#                                            </li>#}
+{#                                        </ul>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <!-- Dropdown-->#}
+{#                            <li class="panel panel-default dropdown">#}
+{#                                <a data-toggle="collapse" href="#dropdown-icon">#}
+{#                                    <span class="icon fa fa-archive"></span><span class="title">Icons</span>#}
+{#                                </a>#}
+{#                                <!-- Dropdown level 1 -->#}
+{#                                <div id="dropdown-icon" class="panel-collapse collapse">#}
+{#                                    <div class="panel-body">#}
+{#                                        <ul class="nav navbar-nav">#}
+{#                                            <li><a href="icons/glyphicons.html">Glyphicons</a>#}
+{#                                            </li>#}
+{#                                            <li><a href="icons/font-awesome.html">Font Awesomes</a>#}
+{#                                            </li>#}
+{#                                        </ul>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </li>#}
+{#                            <li>#}
+{#                                <a href="license.html">#}
+{#                                    <span class="icon fa fa-thumbs-o-up"></span><span class="title">License</span>#}
+{#                                </a>#}
+{#                            </li>#}
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                </nav>
+            </div>
+
+            <!-- -------------------------------------------开发的正文内容-------------------------------------------------------- -->
+            <!-- 开发的正文内容 -->
+            <div class="container-fluid">
+                <div class="side-body">
+                    {% block mainContent %}
+
+                    {% endblock %}
+                </div>
+
+                <div id="modalContainer">
+
+                    {% block FunctionalModal %}
+
+                    {% endblock %}
+
+                    <div class="modal fade" id="modalDanger" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" style="border-style: solid;border-width: 1px;">
+                            <div class="modal-content">
+                                <div class="modal-header" style="background-color: red">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" style="color: white">警告</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <h5 id="dangerContent">您没有选择任何文件</h5>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">我明白了</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modalOk" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" style="border-style: solid;border-width: 1px;">
+                            <div class="modal-content">
+                                <div class="modal-header" style="background-color: forestgreen">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" style="color: white">提示</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <h5 id="okContent"></h5>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">我明白了</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modalNormal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm" style="border-style: solid;border-width: 1px;">
+                            <div class="modal-content">
+                                <div class="modal-header" style="background-color: dimgray">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" style="color: white">提示</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="normalContent"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">我明白了</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+
+            <!-- -------------------------------------------开发的正文内容-------------------------------------------------------- -->
+
+        <footer class="app-footer">
+            <div class="wrapper">
+               <div>毕业测试--大数据可视化仪表盘</div>
+            </div>
+        </footer>
+            <script src="{{ host }}/static/js/jquery.min.js"></script>
+            <!-- Javascript Libs -->
+            <script type="text/javascript" src="{{ host }}/static/lib/js/bootstrap.min.js"></script>
+            <script type="text/javascript" src="{{ host }}/static/lib/js/bootstrap-switch.min.js"></script>
+            <!-- Javascript -->
+              <script type="text/javascript" src="{{ host }}/static/lib/js/Chart.min.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/bootstrap-switch.min.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/jquery.matchHeight-min.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/jquery.dataTables.min.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/dataTables.bootstrap.min.js"></script>
+
+              <script type="text/javascript" src="{{ host }}/static/lib/js/ace/ace.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/ace/mode-html.js"></script>
+              <script type="text/javascript" src="{{ host }}/static/lib/js/ace/theme-github.js"></script>
+
+            <!-- Javascript -->
+{#            <script type="text/javascript" src="{{ host }}/static/js/app.js"></script>#}
+            <!-- myCurrentCode -->
+
+            <!-- newCode -->
+            <script type="text/javascript" src="{{ host }}/static/js/echarts.js"></script>
+                <script type="text/javascript" src="{{ host }}/static/js/dataTool.js"></script>
+            <script type="text/javascript" src="{{ host }}/static/js/dataTool.js"></script>
+            <script src="{{ host }}/static/js/react.js"></script>
+            <script src="{{ host }}/static/js/react-dom.js"></script>
+            <script src="{{ host }}/static/js/browser.min.js"></script>
+            <script  src="{{ host }}/static/myJs/main.js"  type="text/babel"></script>
+
+            <!-- 主题 -->
+            <script type="text/javascript" src="{{ host }}/static/js/dark.js"></script>
+            <script type="text/javascript" src="{{ host }}/static/js/infographic.js"></script>
+            <script type="text/javascript" src="{{ host }}/static/js/shine.js"></script>
+            {% block myJavascript %}
+
+            {% endblock %}
+</body>
+
+</html>

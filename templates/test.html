@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="testarea" style="width: 600px;height: 600px;"></div>
+</body>
+<script type="text/javascript" src="http://127.0.0.1:8000/static/js/echarts.js"></script>
+<script src="http://127.0.0.1:8000/static/js/jquery.min.js"></script>
+<script src="static/myJs/common.js"></script>
+<script src="static/myJs/parameter.js"></script>
+<script src="static/myJs/newChartManager.js"></script>
+<script src="http://127.0.0.1:8000/static/js/china.js"></script>
+<script src="http://127.0.0.1:8000/static/js/world.js"></script>
+<script type="text/javascript" src="http://127.0.0.1:8000/static/js/dataTool.js"></script>
+<script>
+    var chart = echarts.init(document.getElementById('testarea'));
+    var interface = createChartManager(chart,defaultMainChart,getParas);
+</script>
+</html>
