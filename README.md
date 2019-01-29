@@ -11,8 +11,7 @@
 
 # screenshots
 
-![]https://raw.githubusercontent.com/talkingwallace/Pictures/master/1527618075(1).jpg
-
+![](https://raw.githubusercontent.com/talkingwallace/Pictures/master/1527618075(1).jpg)
 
 # comments from developer
 
